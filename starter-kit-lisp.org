@@ -207,7 +207,7 @@ pretty \lambda's in clojure
 #+begin_src emacs-lisp
 (add-hook 'lisp-mode-hook 'run-starter-kit-coding-hook)
 ;; (add-hook 'lisp-mode-hook 'idle-highlight)
-(add-hook 'lisp-mode-hook 'turn-on-paredit)
+;; (add-hook 'lisp-mode-hook 'turn-on-paredit)
 (font-lock-add-keywords 'lisp-mode
 			'(("(\\|)" . 'starter-kit-paren-face)))
 #+end_src
