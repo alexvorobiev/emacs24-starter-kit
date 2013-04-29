@@ -415,6 +415,9 @@ project is not in elpa.
 After we've loaded all the Starter Kit defaults, lets load the User's stuff.
 #+name: starter-kit-load-files
 #+begin_src emacs-lisp
+  ;; name for the user's config file to avoid adding common settings to
+  ;; starter kit files
+  (setq common-config-file "config")
   (flet ((sk-load (base)
            (let* ((path          (expand-file-name base starter-kit-dir))
                   (literate      (concat path ".org"))
@@ -437,6 +440,8 @@ After we've loaded all the Starter Kit defaults, lets load the User's stuff.
       (when (file-exists-p elisp-dir)
         (let ((default-directory elisp-dir))
           (normal-top-level-add-subdirs-to-load-path)))
+      ;; load common user config
+      (sk-load common-config-file)
       ;; load system-specific config
       (sk-load system-name)
       ;; load user-specific config
