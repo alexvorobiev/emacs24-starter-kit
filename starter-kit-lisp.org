@@ -29,7 +29,7 @@ much more comfortable experience.  This is especially useful in
 combination with the sexp movement functions (=C-M-f= forward, =C-M-b=
 back, =C-M-u= up, =C-M-d= down)
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (defun turn-on-paredit ()
   (paredit-mode +1))
 #+end_src
@@ -62,7 +62,7 @@ back, =C-M-u= up, =C-M-d= down)
 (add-hook 'emacs-lisp-mode-hook 'run-starter-kit-coding-hook)
 (add-hook 'emacs-lisp-mode-hook 'starter-kit-remove-elc-on-save)
 ;; (add-hook 'emacs-lisp-mode-hook 'idle-highlight)
-(add-hook 'emacs-lisp-mode-hook 'turn-on-paredit)
+;; (add-hook 'emacs-lisp-mode-hook 'turn-on-paredit)
 (define-key emacs-lisp-mode-map (kbd "C-c v") 'eval-buffer)
 
 (defun starter-kit-remove-elc-on-save ()
@@ -82,7 +82,7 @@ back, =C-M-u= up, =C-M-d= down)
    :CUSTOM_ID: clojure
    :END:
 
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (require 'clojure-mode)
 
   (add-hook 'clojure-mode-hook 'run-starter-kit-coding-hook)
