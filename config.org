@@ -705,8 +705,11 @@ install packages.
 #+end_src
    
 ** Emacs on Windows 
+#+BEGIN_SRC emacs-lisp
+  (defvar running-ntemacs nil)
+#+END_SRC
 #+begin_src emacs-lisp :tangle (if (eq system-type 'windows-nt) "yes" "no")
-  (defvar running-ntemacs t)
+  (setq running-ntemacs t)
   ;; (when running-ntemacs                 
   ;;   (require 'ntemacs-config))
   
