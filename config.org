@@ -656,7 +656,10 @@ install packages.
 ;  (diminish 'flyspell-mode)
   (diminish 'abbrev-mode)
 #+end_src
-
+*** Modeline
+    #+BEGIN_SRC emacs-lisp
+    (set-face-attribute 'mode-line nil :height 90)
+    #+END_SRC
 *** e2wm Emacs window manager
 #+begin_src emacs-lisp
   (av/require+ 'e2wm)
