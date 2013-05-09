@@ -546,6 +546,10 @@ install packages.
 **** Enhancements
 #+begin_src emacs-lisp
   (av/require+ 'dired+)
+  (av/require+ 'icicles) ;; required by dired+
+  (define-key ctl-x-map   "d" 'diredp-dired-files)
+  (define-key ctl-x-4-map "d" 'diredp-dired-files-other-window)
+
   (av/require+ 'dired-details)
   (av/require+ 'dired-details+)
 #+end_src
@@ -657,8 +661,14 @@ install packages.
   (diminish 'abbrev-mode)
 #+end_src
 *** Modeline
-    #+BEGIN_SRC emacs-lisp
-    (set-face-attribute 'mode-line nil :height 90)
+    #+BEGIN_SRC emacs-lisp :tangle (if (window-system) "yes" "no")
+      (set-face-attribute 'mode-line nil :height 90)
+      (set-face-attribute 'mode-line-inactive nil :height 90)
+
+      (av/require+ 'powerline)
+      (set-face-background 'powerline-active1 "#002b36")
+      (set-face-background 'powerline-active2 "#073642")
+      (powerline-default-theme)
     #+END_SRC
 *** e2wm Emacs window manager
 #+begin_src emacs-lisp
@@ -1709,6 +1719,10 @@ install packages.
     
     ;;; Outline mode
   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
+
+  ;; dynamic evaluation
+  (av/require+ 'litable)
+  (add-hook 'emacs-lisp-mode-hook 'litable-mode)
 #+end_src
 
 * org-configuration
