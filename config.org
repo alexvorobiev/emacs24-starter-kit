@@ -1703,7 +1703,7 @@ install packages.
     ;;; Display ^L as horizontal lines
   (av/require+ 'page-break-lines)
   (diminish 'page-break-lines-mode)
-
+  
   (add-hook 'compilation-mode-hook 'page-break-lines-mode)
   (add-hook 'help-mode-hook 'page-break-lines-mode)
     
@@ -1719,10 +1719,15 @@ install packages.
     
     ;;; Outline mode
   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
-
+  
   ;; dynamic evaluation
   (av/require+ 'litable)
   (add-hook 'emacs-lisp-mode-hook 'litable-mode)
+  
+  ;; highlight s-expressions
+  (av/require+ 'hl-sexp)
+  (set-face-background 'hl-sexp-face (face-background 'mode-line))
+  (add-hook 'emacs-lisp-mode-hook 'hl-sexp-mode)
 #+end_src
 
 * org-configuration
