@@ -1520,6 +1520,10 @@ install packages.
   (setq ess-use-tracebug t)
                                           ;(setq ess-ask-for-ess-directory t)
                                           ;(setq ess-microsoft-p t)
+
+  ;; ess-R-dv-ctable shows table in other buffer. 
+  ;; ess-R-dv-pprint shows pretty-printed text in other buffer
+  (av/require+ 'ess-R-data-view)
 #+end_src
 
 *** R
