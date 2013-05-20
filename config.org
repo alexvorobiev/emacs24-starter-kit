@@ -409,9 +409,9 @@ install packages.
   (global-set-key (kbd "M-C-=") 'mc/mark-all-like-this)
 #+end_src
 *** Regions
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (put 'narrow-to-region 'disabled nil)
-#+END_SRC
+#+end_src
 *** Help
 #+begin_src emacs-lisp
   ;; Custom 'apropos' key bindings
@@ -661,7 +661,7 @@ install packages.
   (diminish 'abbrev-mode)
 #+end_src
 *** Modeline
-    #+BEGIN_SRC emacs-lisp :tangle (if (window-system) "yes" "no")
+    #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
       (set-face-attribute 'mode-line nil :height 90)
       (set-face-attribute 'mode-line-inactive nil :height 90)
 
@@ -669,7 +669,7 @@ install packages.
       (set-face-background 'powerline-active1 "#002b36")
       (set-face-background 'powerline-active2 "#073642")
       (powerline-default-theme)
-    #+END_SRC
+    #+end_src
 *** e2wm Emacs window manager
 #+begin_src emacs-lisp
   (av/require+ 'e2wm)
@@ -682,12 +682,12 @@ install packages.
   
 #+end_src
 *** When emacs starts in console mode 
-#+BEGIN_SRC elisp :tangle (if window-system "no" "yes")
+#+begin_src elisp :tangle (if window-system "no" "yes")
   ;; Vertical window separator
   (set-face-inverse-video-p 'vertical-border nil)
   (set-face-background 'vertical-border (face-background 'default))
   (set-display-table-slot standard-display-table 5 (make-glyph-code ?┃))
-#+END_SRC
+#+end_src
 ** Directories
 #+begin_src emacs-lisp
   ;; Root of the emacs temp directories
@@ -718,9 +718,9 @@ install packages.
 #+end_src
    
 ** Emacs on Windows 
-#+BEGIN_SRC emacs-lisp
+#+begin_src emacs-lisp
   (defvar running-ntemacs nil)
-#+END_SRC
+#+end_src
 #+begin_src emacs-lisp :tangle (if (eq system-type 'windows-nt) "yes" "no")
   (setq running-ntemacs t)
   ;; (when running-ntemacs                 
