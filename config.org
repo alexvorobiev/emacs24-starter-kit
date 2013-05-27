@@ -72,8 +72,10 @@ install packages.
 
 #+begin_src emacs-lisp
   (starter-kit-load "org")
+
   (starter-kit-load "eshell")
   (starter-kit-load "lisp")
+
   (require 'cl)
 #+end_src
 
@@ -119,6 +121,7 @@ for this file) to jump to it.
            ))
     (set-register (car r) (cadr r)))
 #+end_src
+
 ** Minibuffer
 *** Ido-mode
 **** Base Ido: show recent files
@@ -949,6 +952,7 @@ for this file) to jump to it.
       
       (require 'imenu+ nil t)
     #+end_src
+
 * Major modes
 ** 1010
 #+begin_src emacs-lisp
@@ -990,8 +994,6 @@ for this file) to jump to it.
     (require 'org-eshell)
     
     ;; add menu of the items
-    ;(add-hook 'org-mode-hook
-    ;          (lambda () (imenu-add-to-menubar "Imenu")))
     
     (require 'org-mouse)
     
@@ -1093,6 +1095,7 @@ for this file) to jump to it.
   
   (setq org-use-speed-commands t)
 #+end_src
+
 **** Makes the keywords in templates lowercase
      #+begin_src emacs-lisp
      (setq org-structure-template-alist
@@ -1110,6 +1113,7 @@ for this file) to jump to it.
               ("i" "#+index: ?" "#+index: ?")
               ("I" "#+include %file ?" "<include file=%file markup=\"?\">"))))
      #+end_src
+
 *** Org protocol and capture
 #+begin_src emacs-lisp
    ;(require 'org-protocol)
@@ -1531,6 +1535,7 @@ for this file) to jump to it.
                     org-latex-pdf-process))))
   
 #+end_src
+
 ** ESS
 *** General
 #+begin_src emacs-lisp
@@ -1758,11 +1763,6 @@ for this file) to jump to it.
     ;;; Debugger extensions https://github.com/ScottyB/edebug-x
   (av/require+ 'edebug-x)
   
-    ;;; add menu of the items
-  ;(add-hook 'emacs-lisp-mode-hook
-  ;          (lambda () (message (buffer-name))
-  ;            (when (buffer-file-name) (imenu-add-to-menubar "Imenu"))))
-    
     ;;; Outline mode
   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
   
@@ -1779,3 +1779,4 @@ for this file) to jump to it.
 * org-configuration
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+OPTIONS: ^:nil
+
