@@ -361,7 +361,7 @@ everyone using the starter kit.
   #+end_src
 
 - Registers for jumping to commonly used files in [[file:starter-kit-registers.org][starter-kit-registers]]
-  #+begin_src emacs-lisp
+  #+begin_src emacs-lisp :tangle "no"
   (starter-kit-load "starter-kit-registers.org")
   #+end_src
 
