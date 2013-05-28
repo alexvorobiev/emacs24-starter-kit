@@ -898,8 +898,23 @@ for this file) to jump to it.
 #+end_src
 *** Magit
 #+begin_src emacs-lisp
-  (setq magit-git-executable "git")
-  
+    (use-package magit
+      :init (progn
+              (setq magit-git-executable "git")
+              
+              ;; full screen magit-status
+              
+              (defadvice magit-status (around magit-fullscreen activate)
+                (window-configuration-to-register :magit-fullscreen)
+                ad-do-it
+                (delete-other-windows))
+              
+              (defun magit-quit-session ()
+                "Restores the previous window configuration and kills the magit buffer"
+                (interactive)
+                (kill-buffer)
+                (jump-to-register :magit-fullscreen)))
+      :bind ("q" . magit-quit-session))
 #+end_src
 ** Development
 *** Check syntax on the fly
