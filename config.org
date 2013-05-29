@@ -459,7 +459,7 @@ for this file) to jump to it.
 ;  (show-paren-mode 1) ;smartparens does it now
 #+end_src
 ** Color theme
-#+begin_src emacs-lisp :tangle (if window-system "yes" "no")
+#+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
   ;;; Do not load in console mode - rely on terminal settings
   
   (av/require+ 'solarized-theme)
@@ -700,11 +700,14 @@ for this file) to jump to it.
   
 #+end_src
 *** When emacs starts in console mode 
-#+begin_src elisp :tangle (if window-system "no" "yes")
+#+begin_src emacs-lisp :tangle (if (window-system) "no" "yes")
   ;; Vertical window separator
   (set-face-inverse-video-p 'vertical-border nil)
   (set-face-background 'vertical-border (face-background 'default))
-  (set-display-table-slot standard-display-table 5 (make-glyph-code ?┃))
+                                          ;(set-display-table-slot standard-display-table 5 (make-glyph-code ?┃))
+  (set-display-table-slot standard-display-table
+                          'vertical-border 
+                          (make-glyph-code ?┃))
 #+end_src
 ** Directories
 #+begin_src emacs-lisp
