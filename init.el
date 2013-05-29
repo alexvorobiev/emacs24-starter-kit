@@ -38,10 +38,7 @@
 (when custom-org-path 
   (setq load-path (remove-if (lambda (x) (string-match-p "org$" x)) load-path))
 
-  (add-to-list 'load-path custom-org-path)
-
-  (eval-after-load 'info
-    '(add-to-list 'Info-default-directory-list custom-org-path)))
+  (add-to-list 'load-path custom-org-path))
 
 (require 'org)
 
