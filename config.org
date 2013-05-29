@@ -936,7 +936,10 @@ for this file) to jump to it.
     
  ;; http://stackoverflow.com/questions/2494096/emacs-key-binding-fallback
     (defmacro define-key-with-fallback (keymap key def condition &optional mode)
-      "Define key with fallback. Binds KEY to definition DEF in keymap KEYMAP, the binding is active when the CONDITION is true. Otherwise turns MODE off and re-enables previous definition for KEY. If MODE is nil, tries to recover it by stripping off \"-map\" from KEYMAP name."
+      "Define key with fallback. Binds KEY to definition DEF in keymap KEYMAP, 
+the binding is active when the CONDITION is true. Otherwise turns MODE off and
+re-enables previous definition for KEY. If MODE is nil, tries to recover it by 
+stripping off \"-map\" from KEYMAP name."
       `(define-key ,keymap ,key
          (lambda () (interactive)
             (if ,condition ,def
@@ -950,14 +953,6 @@ for this file) to jump to it.
                      (original-func (key-binding ,key)))
                 (call-interactively original-func))))))
     
- ;   (add-hook  'outline-minor-mode-hook
- ;              '(lambda ()
- ;                 (outline-hide-sublevels 1)))
-    
-;    (define-key-with-fallback outline-minor-mode-map (kbd "TAB") 
-;      (outline-cycle 1) (outline-on-heading-p))
-    
-    ;(setq outline-minor-mode-prefix "\C-c")
    (require 'outorg nil t)
    (require 'navi-mode nil t)
 #+end_src
@@ -1666,55 +1661,53 @@ for this file) to jump to it.
 
 ** SQL
 #+begin_src emacs-lisp
-  (use-package
-   sql
-   :init
-   (progn
-     (setq sql-postgres-program "nzsql")
-
-     
-     (sql-set-product-feature 'postgres
-                              :prompt-regexp "^\\w*(\\w*)=> ")
-     
-     (sql-set-product-feature 'postgres
-                              :prompt-cont-regexp "^\\w*(\\w*)[-(]> ")
+  (use-package sql
+    :init
+    (progn
+      (setq sql-postgres-program "nzsql")
   
-     ;; Make underscore one of the letters instead of a word serapator
-     (sql-set-product-feature 'postgres
-                           :syntax-alist '((?_ . "w")))
-    
-     (add-hook 'sql-interactive-mode-hook 
-               (lambda ()
-                 (modify-syntax-entry ?_ "w" sql-mode-syntax-table)))
+      (sql-set-product-feature 'postgres
+                               :prompt-regexp "^\\w*(\\w*)=> ")
+      
+      (sql-set-product-feature 'postgres
+                               :prompt-cont-regexp "^\\w*(\\w*)[-(]> ")
   
-     ;; Don't wrap the (usually long) lines of the result
-     (add-hook 'sql-interactive-mode-hook
-               'toggle-truncate-lines)
-
-     ;; Do not ask for credentials, use default values
-     (defalias 'sql-get-login 'ignore)
+      ;; Make underscore one of the letters instead of a word serapator
+      (sql-set-product-feature 'postgres
+                               :syntax-alist '((?_ . "w")))
+      
+      (add-hook 'sql-interactive-mode-hook 
+                (lambda ()
+                  (modify-syntax-entry ?_ "w" sql-mode-syntax-table)))
   
-     ;; Hide echoed input
-     (setq comint-process-echoes t)
+      ;; Don't wrap the (usually long) lines of the result
+      (add-hook 'sql-interactive-mode-hook
+                'toggle-truncate-lines)
   
-     ;; Override the one that is in sql.el to use default password
-     (defun sql-comint-postgres (product options)
-       "Create comint buffer and connect to Postgres."
-       (let ((params options))
-         (if (not (string= "" sql-database))
-             (setq params (append params (list sql-database))))
-         (if (not (string= "" sql-server))
-             (setq params (append (list "-h" sql-server) params)))
-         (if (not (string= "" sql-user))
-             (setq params (append (list "-U" sql-user) params)))
-         (if (not (string= "" sql-password))
-             (setq params (append (list "-W" sql-password) params)))
-         (if (not (= 0 sql-port))
-             (setq params (append (list "-p" (number-to-string sql-port)) params)))
-         (sql-comint product params)))
-    
-     (av/require+ 'sql-indent)
-     (add-hook 'sql-mode-hook 'outline-minor-mode)))
+      ;; Do not ask for credentials, use default values
+      (defalias 'sql-get-login 'ignore)
+  
+      ;; Hide echoed input
+      (setq comint-process-echoes t)
+  
+      ;; Override the one that is in sql.el to use default password
+      (defun sql-comint-postgres (product options)
+        "Create comint buffer and connect to Postgres."
+        (let ((params options))
+          (if (not (string= "" sql-database))
+              (setq params (append params (list sql-database))))
+          (if (not (string= "" sql-server))
+              (setq params (append (list "-h" sql-server) params)))
+          (if (not (string= "" sql-user))
+              (setq params (append (list "-U" sql-user) params)))
+          (if (not (string= "" sql-password))
+              (setq params (append (list "-W" sql-password) params)))
+          (if (not (= 0 sql-port))
+              (setq params (append (list "-p" (number-to-string sql-port)) params)))
+          (sql-comint product params)))
+      
+      (av/require+ 'sql-indent)
+      (add-hook 'sql-mode-hook 'outline-minor-mode)))
   
 #+end_src
    
