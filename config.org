@@ -75,8 +75,6 @@ install packages.
 
 #+begin_src emacs-lisp
   (starter-kit-load "org")
-
-  (starter-kit-load "eshell")
   (starter-kit-load "lisp")
 
   (require 'cl)
@@ -97,7 +95,7 @@ install packages.
   ;;(add-to-list 'load-path "~/elisp/packages-emacs")
   ;;(load-file "~/.emacs.secrets")
 #+end_src
-** asfds
+
 ** Recent files
 #+begin_src emacs-lisp
   ;;; list-packages opens those
@@ -272,6 +270,10 @@ for this file) to jump to it.
 #+begin_src emacs-lisp
   (mouse-avoidance-mode 'animate)
 #+end_src
+*** Frequent combinations
+    #+begin_src emacs-lisp
+      (global-set-key (kbd ",") (lambda () (interactive) (insert ", ")))
+    #+end_src
 *** Shortcut for appending to register
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-x r a") 'append-to-register)
@@ -1561,9 +1563,13 @@ stripping off \"-map\" from KEYMAP name."
 ** ESS
 *** General
 #+begin_src emacs-lisp
-; until updated ess is in elpa
-;  (sacha/package-install 'ess)
-   (av/require+ 'ess) ; change to use-package
+    
+  (av/require+ 'ess) ; change to use-package
+    
+  ;; has to be set before loading ess-site
+  (when running-ntemacs
+    (setq ess-directory-containing-R "c:"))
+  
   (require 'ess-site)
   
   (setq-default ansi-color-for-comint-mode 'filter
@@ -1575,11 +1581,11 @@ stripping off \"-map\" from KEYMAP name."
   (setq ess-ask-for-ess-directory nil)
   (setq ess-use-auto-complete t)
   
-    ;;; enabled globally in ../keys.el
-  (defun ess-comma-space ()
-    (local-set-key (kbd ",") (lambda () (interactive) (insert ", "))))
+        ;;; enabled globally in ../keys.el
+  ;(defun ess-comma-space ()
+  ;  (local-set-key (kbd ",") (lambda () (interactive) (insert ", "))))
   
-  (add-hook 'ess-mode-hook 'ess-comma-space)
+  ;(add-hook 'ess-mode-hook 'ess-comma-space)
   
   ;; conflicts with ess-R-smart-operators
   ;;(add-hook 'inferior-ess-mode-hook 'ess-comma-space)
@@ -1587,19 +1593,10 @@ stripping off \"-map\" from KEYMAP name."
   ;; debugger
   (setq ess-tracebug-prefix "\M-c")
   (setq ess-use-tracebug t)
-                                          ;(setq ess-ask-for-ess-directory t)
-                                          ;(setq ess-microsoft-p t)
-
-  ;; ess-R-dv-ctable shows table in other buffer. 
-  ;; ess-R-dv-pprint shows pretty-printed text in other buffer
-  (av/require+ 'ess-R-data-view)
 #+end_src
 
 *** R
 #+begin_src emacs-lisp
-  (when running-ntemacs
-    (setq inferior-R-program-name "c:/R/R-3.0.0/bin/x64/Rterm.exe"))
-  
   ;; Smart comma, see http://ess.r-project.org/Manual/ess.html#Handy-commands
   (setq ess-R-smart-operators t)
   
@@ -1647,6 +1644,10 @@ stripping off \"-map\" from KEYMAP name."
     "View *R* objects in a dired-like buffer." t)
   
   (av/require+ 'ess-smart-underscore)
+
+  ;; ess-R-dv-ctable shows table in other buffer. 
+  ;; ess-R-dv-pprint shows pretty-printed text in other buffer
+  (av/require+ 'ess-R-data-view)
 
   
   ;; open shell, then run
@@ -1771,7 +1772,98 @@ stripping off \"-map\" from KEYMAP name."
               (define-key shell-mode-map
                 (kbd "C-d") 'comint-delchar-or-eof-or-kill-buffer)))
 #+end_src
+** Eshell
+*** From the Starter Kit:
+   #+begin_src emacs-lisp
+     (setq eshell-cmpl-cycle-completions nil
+        eshell-save-history-on-exit t
+        eshell-cmpl-dir-ignore "\\`\\(\\.\\.?\\|CVS\\|\\.svn\\|\\.git\\)/\\'")
+  
+  (eval-after-load 'esh-opt
+    '(progn
+       (require 'em-cmpl)
+       (require 'em-prompt)
+       (require 'em-term)
+       ;; TODO: for some reason requiring this here breaks it, but
+       ;; requiring it after an eshell session is started works fine.
+       ;; (require 'eshell-vc)
+       (setenv "PAGER" "cat")
+       ; (set-face-attribute 'eshell-prompt nil :foreground "turquoise1")
+       (add-hook 'eshell-mode-hook ;; for some reason this needs to be a hook
+                 '(lambda () (define-key eshell-mode-map "\C-a" 'eshell-bol)))
+       (add-to-list 'eshell-visual-commands "ssh")
+       (add-to-list 'eshell-visual-commands "tail")
+       (add-to-list 'eshell-command-completions-alist
+                    '("gunzip" "gz\\'"))
+       (add-to-list 'eshell-command-completions-alist
+                    '("tar" "\\(\\.tar|\\.tgz\\|\\.tar\\.gz\\)\\'"))
+  ))
+   #+end_src
 
+    The =eshell= directory holds alias definitions and history
+    information. It is much like a =.bashrc= file for those who are
+    familiar with bash. This set the value of =eshell-directory-name= to
+    point to the =eshell= directory in this directory. The =alias= file is
+    pre-populated with some generally applicable aliases.
+
+   #+begin_src emacs-lisp
+     (setq eshell-directory-name
+           (expand-file-name "./" (expand-file-name "eshell" starter-kit-dir)))
+   #+end_src
+*** Completion for Git
+    https://tsdh.wordpress.com/2013/05/31/eshell-completion-for-git-bzr-and-hg/
+    #+begin_src emacs-lisp
+      (defun pcmpl-git-commands ()
+        "Return the most common git commands by parsing the git output."
+        (with-temp-buffer
+          (call-process-shell-command "git" nil (current-buffer) nil "help" "--all")
+          (goto-char 0)
+          (search-forward "available git commands in")
+          (let (commands)
+            (while (re-search-forward
+                    "^[[:blank:]]+\\([[:word:]-.]+\\)[[:blank:]]*\\([[:word:]-.]+\\)?"
+                    nil t)
+              (push (match-string 1) commands)
+              (when (match-string 2)
+                (push (match-string 2) commands)))
+            (sort commands #'string<))))
+      
+      (defconst pcmpl-git-commands (pcmpl-git-commands)
+        "List of `git' commands.")
+      
+      (defvar pcmpl-git-ref-list-cmd "git for-each-ref refs/ --format='%(refname)'"
+        "The `git' command to run to get a list of refs.")
+      
+      (defun pcmpl-git-get-refs (type)
+        "Return a list of `git' refs filtered by TYPE."
+        (with-temp-buffer
+          (insert (shell-command-to-string pcmpl-git-ref-list-cmd))
+          (goto-char (point-min))
+          (let (refs)
+            (while (re-search-forward (concat "^refs/" type "/\\(.+\\)$") nil t)
+              (push (match-string 1) refs))
+            (nreverse refs))))
+      
+      (defun pcmpl-git-remotes ()
+        "Return a list of remote repositories."
+        (split-string (shell-command-to-string "git remote")))
+      
+      (defun pcomplete/git ()
+        "Completion for `git'."
+        ;; Completion for the command argument.
+        (pcomplete-here* pcmpl-git-commands)
+        (cond
+         ((pcomplete-match "help" 1)
+          (pcomplete-here* pcmpl-git-commands))
+         ((pcomplete-match (regexp-opt '("pull" "push")) 1)
+          (pcomplete-here (pcmpl-git-remotes)))
+         ;; provide branch completion for the command `checkout'.
+         ((pcomplete-match "checkout" 1)
+          (pcomplete-here* (append (pcmpl-git-get-refs "heads")
+                                   (pcmpl-git-get-refs "tags"))))
+         (t
+          (while (pcomplete-here (pcomplete-entries))))))
+    #+end_src
 ** Emacs Lisp
 #+begin_src emacs-lisp
     ;;; Display ^L as horizontal lines
