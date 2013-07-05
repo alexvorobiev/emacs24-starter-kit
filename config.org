@@ -480,10 +480,10 @@ for this file) to jump to it.
 ** Kill-ring management
 
 #+begin_src emacs-lisp
-(av/require+ 'browse-kill-ring)
-(when (require 'browse-kill-ring nil 'noerror)
-  (browse-kill-ring-default-keybindings))
-(setq browse-kill-ring-quit-action 'save-and-restore)
+;(av/require+ 'browse-kill-ring)
+;(when (require 'browse-kill-ring nil 'noerror)
+;  (browse-kill-ring-default-keybindings))
+;(setq browse-kill-ring-quit-action 'save-and-restore)
 #+end_src
 
 ** Better undo
@@ -1118,6 +1118,9 @@ stripping off \"-map\" from KEYMAP name."
   ;; Pressing once brings the cursor to the beginning/end of the header
   ;; Press again for the standard behavior
   (setq org-special-ctrl-a/e t)
+
+  ;; Shortcuts for LaTeX
+  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 #+end_src
 
 **** Makes the keywords in templates lowercase
