@@ -1097,30 +1097,32 @@ stripping off \"-map\" from KEYMAP name."
 
 *** Keys
 #+begin_src emacs-lisp
-  (global-set-key "\C-cl" 'org-store-link)
-  (global-set-key "\C-ca" 'org-agenda)
-  (global-set-key "\C-cb" 'org-iswitchb)
-  (define-key global-map "\C-cc" 'org-capture) ;Is it different than the lines above?
+    (global-set-key "\C-cl" 'org-store-link)
+    (global-set-key "\C-ca" 'org-agenda)
+    (global-set-key "\C-cb" 'org-iswitchb)
+    (define-key global-map "\C-cc" 'org-capture) ;Is it different than the lines above?
+    
+    ;; Return to activate a link
+    (setq org-return-follows-link t)
+    
+    (setq org-support-shift-select t)
+    
+    ;; Make windmove work in org-mode:
+    (add-hook 'org-shiftup-final-hook 'windmove-up)
+    (add-hook 'org-shiftleft-final-hook 'windmove-left)
+    (add-hook 'org-shiftdown-final-hook 'windmove-down)
+    (add-hook 'org-shiftright-final-hook 'windmove-right)
+    
+    (setq org-use-speed-commands t)
   
-  ;; Return to activate a link
-  (setq org-return-follows-link t)
-  
-  (setq org-support-shift-select t)
-  
-  ;; Make windmove work in org-mode:
-  (add-hook 'org-shiftup-final-hook 'windmove-up)
-  (add-hook 'org-shiftleft-final-hook 'windmove-left)
-  (add-hook 'org-shiftdown-final-hook 'windmove-down)
-  (add-hook 'org-shiftright-final-hook 'windmove-right)
-  
-  (setq org-use-speed-commands t)
-
-  ;; Pressing once brings the cursor to the beginning/end of the header
-  ;; Press again for the standard behavior
-  (setq org-special-ctrl-a/e t)
-
-  ;; Shortcuts for LaTeX
-  (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
+    ;; Pressing once brings the cursor to the beginning/end of the header
+    ;; Press again for the standard behavior
+    (setq org-special-ctrl-a/e t)
+#+end_src
+**** Shortcuts for LaTeX
+     See [[info:org#CDLaTeX%20mode][info:org#CDLaTeX mode]]
+#+begin_src
+    (add-hook 'org-mode-hook 'turn-on-org-cdlatex)
 #+end_src
 
 **** Makes the keywords in templates lowercase
@@ -1774,6 +1776,10 @@ stripping off \"-map\" from KEYMAP name."
             (lambda ()
               (define-key shell-mode-map
                 (kbd "C-d") 'comint-delchar-or-eof-or-kill-buffer)))
+#+end_src
+   ANSI colors for shell buffers
+#+begin_src emacs-lisp
+  (add-hook 'shell-mode-hook 'ansi-color-for-comint-mode-on)
 #+end_src
 ** Eshell
 *** From the Starter Kit:
