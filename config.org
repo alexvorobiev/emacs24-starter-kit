@@ -1443,7 +1443,7 @@ stripping off \"-map\" from KEYMAP name."
   \\setheadwidth{paper}
   \\setfootwidth{paper}
   \\cohead[]{
-    \\includegraphics[width=7.75in]{/cygdrive/c/Users/avorobi/Documents/TransUnionLogo.png}
+    \\includegraphics[width=7.75in]{c:/Users/avorobi/Documents/TransUnionLogo.png}
   }
   \\pagestyle{scrplain}
   \\AtBeginDocument{\\vspace*{5\\baselineskip}\\thispagestyle{scrheadings}}
@@ -1524,44 +1524,44 @@ stripping off \"-map\" from KEYMAP name."
 **** Other settings
 #+begin_src emacs-lisp
   ;; Some packages
-  (add-to-list 'org-latex-packages-alist '("" "setspace"))
-  (add-to-list 'org-latex-packages-alist '("" "relsize"))
-  (add-to-list 'org-latex-packages-alist '("automark,nouppercase" "scrpage2"))
-
+  (add-to-list 'org-latex-packages-alist '("" "setspace" nil))
+  (add-to-list 'org-latex-packages-alist '("" "relsize" nil))
+  (add-to-list 'org-latex-packages-alist '("automark,nouppercase" "scrpage2" nil))
+  
   ;; Font for tt (monospace)
-  (add-to-list 'org-latex-packages-alist '("" "inconsolata"))
-
+  (add-to-list 'org-latex-packages-alist '("" "zi4" nil))
+  
   ;; Use nicer tables
   (setq org-latex-tables-booktabs t
         org-latex-default-table-environment "longtable")
   
       ;;; Minted
   (setq org-latex-listings 'minted)
-  (add-to-list 'org-latex-packages-alist '("" "minted"))
+  (add-to-list 'org-latex-packages-alist '("" "minted" nil)) ;nil means "don't use for previewing"
   
   (add-to-list 'org-latex-minted-langs '(xml-1010 "xml"))
   (add-to-list 'org-latex-minted-langs '(R "r"))
   
       ;;; Tables
-  (add-to-list 'org-latex-packages-alist '("" "booktabs"))
+  (add-to-list 'org-latex-packages-alist '("" "booktabs" nil))
   
-  
+  ;; minted needs -shell-escape command line option
   (setq org-latex-pdf-process 
         (mapcar (lambda (str) 
                   (replace-regexp-in-string "pdflatex" "pdflatex -shell-escape" str))
                 org-latex-pdf-process))
   
       ;;; Cygwin pdflatex needs unix-style paths
-  (when (string-match "Cygwin" (shell-command-to-string "pdflatex -v"))
-    (progn
-      (setq org-latex-pdf-process 
-            (mapcar (lambda (str)
-                      (concat "bash -c -l \"cd $(dirname $(cygpath %f));"
-                              (replace-regexp-in-string
-                               "%f" "$(cygpath %f)"
-                               (replace-regexp-in-string "%o" "$(dirname %f)" str))
-                              "\""))
-                    org-latex-pdf-process))))
+  ;; (when (string-match "Cygwin" (shell-command-to-string "pdflatex -v"))
+  ;;   (progn
+  ;;     (setq org-latex-pdf-process 
+  ;;           (mapcar (lambda (str)
+  ;;                     (concat "bash -c -l \"cd $(dirname $(cygpath %f));"
+  ;;                             (replace-regexp-in-string
+  ;;                              "%f" "$(cygpath %f)"
+  ;;                              (replace-regexp-in-string "%o" "$(dirname %f)" str))
+  ;;                             "\""))
+  ;;                   org-latex-pdf-process))))
   
 #+end_src
 
