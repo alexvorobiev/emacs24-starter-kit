@@ -808,7 +808,7 @@ for this file) to jump to it.
   
   (av/require+ 'cygwin-mount)
   (require 'setup-cygwin)
-
+  
   (when
     (require 'w32-symlinks nil t)
     (setq w32-symlinks-handle-shortcuts t))
@@ -819,7 +819,9 @@ for this file) to jump to it.
                                           ;(add-to-list 'load-path site-lisp)
   
   ;; Git has its own set of binaries (from MSYS)
-  (add-to-list 'exec-path "~/tools/Git/bin")
+  (add-to-list 'exec-path (expand-file-name "~/tools/Git/bin"))
+  (setenv "PATH"
+          (concat (expand-file-name "~/tools/Git/bin") ";"  (getenv "PATH")))
   ;; choose this if Cygwin gets confused
   ;(add-to-list 'exec-path "~/tools/Git/cmd")
   
@@ -964,7 +966,7 @@ stripping off \"-map\" from KEYMAP name."
    (require 'navi-mode nil t)
 #+end_src
 *** Imenu
-    #+begin_src emacs-lisp
+    #+begin_src emacs-lisp :tangle "no"
       ;; ‘font-lock-mode-hook’ is run after entering a major mode.
       (defun try-to-add-imenu ()
         (condition-case nil (imenu-add-to-menubar "Imenu") (error nil)))
@@ -981,7 +983,7 @@ stripping off \"-map\" from KEYMAP name."
   (setq org-babel-xml-1010-tendo-path (expand-file-name "~/bin/tendo.exe"))
 #+end_src
 ** Org
-**** Replace stock Org with the latest development snapshot
+*** Replace stock Org with the latest development snapshot
 #+begin_src emacs-lisp
   (unless custom-org-path
     (sacha/package-install 'org-plus-contrib)
@@ -992,7 +994,6 @@ stripping off \"-map\" from KEYMAP name."
     (org-reload))
 #+end_src
 
-
 *** General setup
 #+begin_src emacs-lisp
     ;; My org documents are here
@@ -1001,8 +1002,6 @@ stripping off \"-map\" from KEYMAP name."
     ;; The following lines are always needed.  Choose your own keys.
     (add-to-list 'auto-mode-alist '("\\.org\\'" . org-mode))
     
-    ;;(add-hook 'org-mode-hook 'turn-on-font-lock)  ; org-mode buffers only
-  
     ;;; Encryption of sub-trees
     (require 'org-crypt)
     ;; Encrypt all entries before saving
@@ -1016,15 +1015,7 @@ stripping off \"-map\" from KEYMAP name."
     ;; add menu of the items
     
     (require 'org-mouse)
-    
-    ;; Change TODO status when all checkboxes are checked
-    (defun org-summary-todo (n-done n-not-done)
-      "Switch entry to DONE when all subentries are done, to TODO otherwise."
-      (let (org-log-done org-log-states)   ; turn off logging
-        (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-    
-    (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-    
+   
     (defun gtd ()
       (interactive)
       (find-file "~/org/gtd.org"))
@@ -1083,16 +1074,38 @@ stripping off \"-map\" from KEYMAP name."
       (myorg-update-parent-cookie))
   
 #+end_src
-
+*** ToDo setup
+    [[http://orgmode.org/org.html#TODO-Items][The Org Manual: TODO items]]
+    #+begin_src emacs-lisp
+      ;; TODO sequence
+      (setq org-todo-keywords
+            '((sequence "TODO(t)" "IN_PROGRESS(i)" "WAITING(w@/!)" "ON_HOLD(h!)" "|" "DONE(d@)" "CANCELED(c@)")))
+      
+      (setq org-todo-keyword-faces
+            '(("TODO" . org-warning)
+              ("IN_PROGRESS" . "yellow")
+                                              ;("BLOCKED" . "red")
+              ("WAITING" . "orange")
+              ("DONE" . "green")
+              ("ARCHIVED" . "blue")))
+      
+      ;; Change TODO status when all checkboxes are checked
+      (defun org-summary-todo (n-done n-not-done)
+        "Switch entry to DONE when all subentries are done, to TODO otherwise."
+        (let (org-log-done org-log-states)   ; turn off logging
+          (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+      
+      (add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+      
+    #+end_src
 *** Agenda setup 
 #+begin_src emacs-lisp 
-  (setq org-agenda-files (concat org-directory "/agendas"))
+  (setq org-agenda-files (list (expand-file-name (concat org-directory "/work.org"))))
   (setq org-agenda-restore-windows-after-quit t)
   (setq org-agenda-window-frame-fractions '(0.25 . 0.5))
   
   ;; add multiple timestamps to agenda
-  (setq org-agenda-skip-additional-timestamps-same-entry nil)
-  
+  (setq org-agenda-skip-additional-timestamps-same-entry nil) 
 #+end_src
 
 *** Keys
@@ -1144,20 +1157,74 @@ stripping off \"-map\" from KEYMAP name."
      #+end_src
 
 *** Org protocol and capture
+**** Templates and agenda files
 #+begin_src emacs-lisp
-   ;(require 'org-protocol)
-
-   (setq org-default-notes-file (concat org-directory "/notes.org"))     
-    
-   (setq org-capture-templates
-         '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
-            "* TODO %?\n  Added: %U")
-           ("j" "Journal" entry (file+datetree "~/org/journal.org")
-            "* %?\nEntered on %U\n  %i\n  %a")
-           ("n" "Note" entry (file "~/org/notes.org")
-            "* %?\n  Added: %U")))
+  (setq org-default-notes-file (concat org-directory "/notes.org"))     
+   
+  (defun av/input-subdirectory (root)
+    (let ((subdirs
+           (remove-if-not #'(lambda (f) (and (file-directory-p f)
+                                        (not (string= "." (substring f -1)))))
+                          (directory-files root t))))
+      (expand-file-name
+       (concat root "/"
+               (ido-completing-read "Project: " (mapcar #'file-name-base subdirs))))))
+  
+  (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+           "* TODO %?\n  Added: %U")
+          ("j" "Projects" entry (file+datetree "~/org/projects.org")
+           "* %?%^{category}p\nEntered on %U\n  %i\n  %a")
+          ("n" "Note" entry (file "~/org/notes.org")
+           "* %?\n  Added: %U")
+          ("p" "Project log" entry (file+datetree
+                                    (concat (av/input-subdirectory "~/prj")
+                                            "/project.org"))
+           "* TODO %?\n      Entered on %U\n  %i\n  %a")
+          ("h" "Project log (history)" entry (file+datetree+prompt
+                                    (concat (av/input-subdirectory "~/prj")
+                                            "/project.org"))
+           "* %?\n      Entered on %U\n  %i\n  %a")
+          ("o" "Project todo" entry (file+headline
+                                     (concat (av/input-subdirectory "~/prj")
+                                            "/project.org") "Tasks")
+           "* TODO %?\n   Entered on %U\n  %i\n  %a")))
+  
+  (setq org-agenda-files (concatenate 'list org-agenda-files
+               (let ((subdirs
+                      (remove-if-not #'(lambda (f) (and (file-directory-p f)
+                                                   (not (string= "." (substring f -1)))))
+                                     (directory-files "~/prj" t))))
+                 (mapcar #'(lambda (f) (expand-file-name
+                                   (concat f "/project.org")))
+                          subdirs))))
 
 #+end_src
+**** Temporary frame for org-capture
+     Capture from outside emacs. Bind make-capture-frame to a hot
+     key e.g. in AutoHotKey add #`::Run c:\emacs\bin\emacsclientw.exe -n -e "(make-capture-frame)"
+     [[http://comments.gmane.org/gmane.emacs.orgmode/33650][Clean capture from command line]]
+
+     #+begin_src emacs-lisp
+       (defadvice org-capture-finalize (after delete-capture-frame activate)
+         "Advise capture-finalize to close the frame if it is the capture
+       frame"
+         (if (equal "capture" (frame-parameter nil 'name))
+             (delete-frame)))
+       
+       (defadvice org-capture-destroy (after delete-capture-frame activate)
+         "Advise capture-destroy to close the frame if it is the capture frame"
+         (if (equal "capture" (frame-parameter nil 'name))
+             (delete-frame)))
+       
+       (defun make-capture-frame ()
+         "Create a new frame and run org-capture."
+         (interactive)
+         (make-frame '((name . "capture")))
+         (select-frame-by-name "capture")
+         (delete-other-windows)
+         (org-capture))
+     #+end_src
 *** Mobile Org
 #+begin_src emacs-lisp
   ;;; MobileOrg
