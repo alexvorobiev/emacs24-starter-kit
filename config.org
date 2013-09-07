@@ -1494,44 +1494,6 @@ stripping off \"-map\" from KEYMAP name."
 #+end_src
 ***** LaTeX classes
 #+begin_src emacs-lisp
-
-  (setq TransUnion-doc-latex-class
-        '("TransUnion-doc"
-          "\\documentclass[hidelinks]{scrartcl}
-  [DEFAULT-PACKAGES]
-  [PACKAGES]
-  [EXTRA]
-  \\definecolor{spot}{rgb}{0,0.2,0.6} 
-  \\definecolor{TUgreen}{RGB}{41,93,80} 
-  \\setkomafont{section}{\\color{TUgreen}\\sffamily\\bfseries\\Large} 
-  \\renewcommand{\\sfdefault}{jvn}
-  \\renewcommand*\\familydefault{\\sfdefault}
-  \\clearscrheadfoot
-  \\setheadwidth{paper}
-  \\setfootwidth{paper}
-  \\cohead[]{
-    \\includegraphics[width=7.75in]{c:/Users/avorobi/Documents/TransUnionLogo.png}
-  }
-  \\pagestyle{scrplain}
-  \\AtBeginDocument{\\vspace*{5\\baselineskip}\\thispagestyle{scrheadings}}
-  \\setlength{\\topmargin}{-0.80in}
-  \\setlength{\\textheight}{730pt}
-  \\makeatletter
-  \\renewcommand{\\maketitle}{
-  % \\vspace*{5\\baselineskip}%
-    \\vskip 2em%
-    \\begin{flushright}%
-    {\\LARGE \\@title \\par}%
-    \\end{flushright}%
-    \\par} \\makeatother
-  "
-                       ("\\section{%s}" . "\\section*{%s}")
-                       ("\\subsection{%s}" . "\\subsection*{%s}")
-                       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                       ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  
-  (add-to-list 'org-latex-classes TransUnion-doc-latex-class)
   
   (add-to-list 'org-latex-classes
                '("koma-article"
@@ -1546,47 +1508,6 @@ stripping off \"-map\" from KEYMAP name."
                  ("\\paragraph{%s}" . "\\paragraph*{%s}")
                  ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
   
-  (add-to-list 'org-latex-classes
-               '("TransUnion-memo"
-                 "\\documentclass[hidelinks]{scrartcl}
-                   [DEFAULT-PACKAGES]
-                   [PACKAGES]
-                   [EXTRA]
-  \\usepackage{setspace}
-  \\usepackage{relsize}
-  \\definecolor{spot}{rgb}{0,0.2,0.6} 
-  \\definecolor{TUgreen}{RGB}{41,93,80} 
-  \\setkomafont{section}{\\color{TUgreen}\\sffamily\\bfseries} 
-  \\renewcommand{\\sfdefault}{jvn}
-  \\renewcommand*\\familydefault{\\sfdefault}
-  \\usepackage[automark,nouppercase]{scrpage2}
-  \\clearscrheadfoot
-  \\setheadwidth{paper}
-  \\setfootwidth{paper}
-  \\cohead[]{
-    \\includegraphics[width=7.75in]{/cygdrive/c/Users/avorobi/Documents/TransUnionHeader.jpg}
-  }
-  \\cofoot[]{
-    \\includegraphics[width=7.75in]{/cygdrive/c/Users/avorobi/Documents/TransUnionFooter.png}
-  }
-  \\pagestyle{scrplain}
-  \\AtBeginDocument{\\vspace*{5\\baselineskip}\\thispagestyle{scrheadings}}
-  \\setlength{\\topmargin}{-0.80in}
-  \\setlength{\\textheight}{730pt}
-  \\makeatletter
-  \\renewcommand{\\maketitle}{
-  % \\vspace*{5\\baselineskip}%
-   \\vskip 2em%
-   \\begin{center}%
-    {\\LARGE \\@title \\par}%
-   \\end{center}%
-   \\par} \\makeatother
-                   "
-                 ("\\section{%s}" . "\\section*{%s}")
-                 ("\\subsection{%s}" . "\\subsection*{%s}")
-                 ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-                 ("\\paragraph{%s}" . "\\paragraph*{%s}")
-                 ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
 #+end_src  
 **** Other settings
 #+begin_src emacs-lisp
