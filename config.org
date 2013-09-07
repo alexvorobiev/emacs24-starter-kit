@@ -1171,7 +1171,7 @@ stripping off \"-map\" from KEYMAP name."
                (ido-completing-read "Project: " (mapcar #'file-name-base subdirs))))))
   
   (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline "~/org/gtd.org" "Tasks")
+        '(("t" "Todo" entry (file+headline "~/org/work.org" "Tasks")
            "* TODO %?\n  Added: %U")
           ("j" "Projects" entry (file+datetree "~/org/projects.org")
            "* %?%^{category}p\nEntered on %U\n  %i\n  %a")
@@ -1180,11 +1180,11 @@ stripping off \"-map\" from KEYMAP name."
           ("p" "Project log" entry (file+datetree
                                     (concat (av/input-subdirectory "~/prj")
                                             "/project.org"))
-           "* TODO %?\n      Entered on %U\n  %i\n  %a")
+           "* %?\n     Entered on %U\n  %i\n  %a")
           ("h" "Project log (history)" entry (file+datetree+prompt
                                     (concat (av/input-subdirectory "~/prj")
                                             "/project.org"))
-           "* %?\n      Entered on %U\n  %i\n  %a")
+           "* %?\n     Entered on %U\n  %i\n  %a")
           ("o" "Project todo" entry (file+headline
                                      (concat (av/input-subdirectory "~/prj")
                                             "/project.org") "Tasks")
