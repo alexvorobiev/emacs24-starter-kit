@@ -191,6 +191,10 @@ for this file) to jump to it.
          (if (looking-back "/")
              (insert "~/")
            (call-interactively 'self-insert-command))))))
+
+  ;; Disable TRAMP
+  ;(custom-set-variables
+  ;              '(ido-enable-tramp-completion nil))
 #+end_src
 
 **** Ido anywhere
@@ -1188,7 +1192,7 @@ stripping off \"-map\" from KEYMAP name."
           ("o" "Project todo" entry (file+headline
                                      (concat (av/input-subdirectory "~/prj")
                                             "/project.org") "Tasks")
-           "* TODO %?\n   Entered on %U\n  %i\n  %a")))
+           "* TODO %?\n  Entered on %U\n  %i\n  %a")))
   
   (setq org-agenda-files (concatenate 'list org-agenda-files
                (let ((subdirs
@@ -1878,9 +1882,9 @@ stripping off \"-map\" from KEYMAP name."
     ;;; Outline mode
   (add-hook 'emacs-lisp-mode-hook 'outline-minor-mode)
   
-  ;; dynamic evaluation
-  (av/require+ 'litable)
-  (add-hook 'emacs-lisp-mode-hook 'litable-mode)
+  ;; dynamic evaluation -- need to enable it in *scratch* only
+  ;(av/require+ 'litable)
+  ;(add-hook 'emacs-lisp-mode-hook 'litable-mode)
   
   ;; highlight s-expressions
   (av/require+ 'hl-sexp)
