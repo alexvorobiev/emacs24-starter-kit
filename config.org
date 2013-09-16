@@ -19,7 +19,7 @@
 
 ** el-get
    Install gnuwin32 first (http://getgnuwin32.sourceforge.net/)
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (add-to-list 'load-path "~/.emacs.d/el-get/el-get")
   
   (unless (require 'el-get nil 'noerror)
@@ -36,7 +36,7 @@
    
 ** Auto-install downloads packages from Emacs wiki
 Use it until figure out how to run el-get on Windows
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
     (require 'auto-install)
     (setq auto-install-directory "~/.emacs.d/src")
     (setq auto-install-save-confirm nil)
@@ -706,8 +706,12 @@ for this file) to jump to it.
 #+end_src
 *** Switch windows visually
 #+begin_src emacs-lisp
+  ;; C-x o with numbers
   (av/require+ 'switch-window)
   
+  ;; M-<number> to switch
+  (av/require+ 'window-numbering)
+  (window-numbering-mode 1)
 #+end_src
 *** When emacs starts in console mode 
 #+begin_src emacs-lisp :tangle (if (window-system) "no" "yes")
@@ -717,7 +721,7 @@ for this file) to jump to it.
                                           ;(set-display-table-slot standard-display-table 5 (make-glyph-code ?┃))
   (set-display-table-slot standard-display-table
                           'vertical-border 
-                          (make-glyph-code ?┃))
+                          (make-glyph-code ?║))
 #+end_src
 ** Directories
 #+begin_src emacs-lisp
@@ -941,33 +945,33 @@ for this file) to jump to it.
 #+end_src   
 *** Structure editing
 #+begin_src emacs-lisp
-    (when (require 'outshine nil t)
-    (add-hook  'outline-minor-mode-hook
-               '(lambda ()
-                  (outshine-hook-function))))
-
-    
- ;; http://stackoverflow.com/questions/2494096/emacs-key-binding-fallback
-    (defmacro define-key-with-fallback (keymap key def condition &optional mode)
-      "Define key with fallback. Binds KEY to definition DEF in keymap KEYMAP, 
-the binding is active when the CONDITION is true. Otherwise turns MODE off and
-re-enables previous definition for KEY. If MODE is nil, tries to recover it by 
-stripping off \"-map\" from KEYMAP name."
-      `(define-key ,keymap ,key
-         (lambda () (interactive)
-            (if ,condition ,def
-              (let* ((,(if mode mode
-                         (let* ((keymap-str (symbol-name keymap))
-                                (mode-name-end (- (string-width keymap-str) 4)))
-                           (if (string= "-map" (substring keymap-str mode-name-end))
-                               (intern (substring keymap-str 0 mode-name-end))
-                             (error "Could not deduce mode name from keymap name (\"-map\" missing?)")))) 
-                      nil)
-                     (original-func (key-binding ,key)))
-                (call-interactively original-func))))))
-    
-   (require 'outorg nil t)
-   (require 'navi-mode nil t)
+  (av/require+ 'outshine)
+  (add-hook  'outline-minor-mode-hook
+             '(lambda ()
+                (outshine-hook-function)))
+  
+  
+  ;; http://stackoverflow.com/questions/2494096/emacs-key-binding-fallback
+  (defmacro define-key-with-fallback (keymap key def condition &optional mode)
+    "Define key with fallback. Binds KEY to definition DEF in keymap KEYMAP, 
+  the binding is active when the CONDITION is true. Otherwise turns MODE off and
+  re-enables previous definition for KEY. If MODE is nil, tries to recover it by 
+  stripping off \"-map\" from KEYMAP name."
+    `(define-key ,keymap ,key
+       (lambda () (interactive)
+         (if ,condition ,def
+           (let* ((,(if mode mode
+                      (let* ((keymap-str (symbol-name keymap))
+                             (mode-name-end (- (string-width keymap-str) 4)))
+                        (if (string= "-map" (substring keymap-str mode-name-end))
+                            (intern (substring keymap-str 0 mode-name-end))
+                          (error "Could not deduce mode name from keymap name (\"-map\" missing?)")))) 
+                   nil)
+                  (original-func (key-binding ,key)))
+             (call-interactively original-func))))))
+  
+  (av/require+ 'outorg)
+  (av/require+ 'navi-mode)
 #+end_src
 *** Imenu
     #+begin_src emacs-lisp :tangle "no"
@@ -980,12 +984,6 @@ stripping off \"-map\" from KEYMAP name."
     #+end_src
 
 * Major modes
-** 1010
-#+begin_src emacs-lisp
-  (require 'xml-1010-mode)
-  (add-hook 'xml-1010-mode-hook 'yas/minor-mode-on)
-  (setq org-babel-xml-1010-tendo-path (expand-file-name "~/bin/tendo.exe"))
-#+end_src
 ** Org
 *** Replace stock Org with the latest development snapshot
 #+begin_src emacs-lisp
@@ -1298,7 +1296,7 @@ stripping off \"-map\" from KEYMAP name."
    '((R . t)
      (sh . t)
      (emacs-lisp . t)
-     (xml-1010 . t) 
+;     (xml-1010 . t) 
      (sql . t)))
   
   (setq org-src-fontify-natively t)
@@ -1406,11 +1404,6 @@ stripping off \"-map\" from KEYMAP name."
           (if (member "output" (split-string result-type))
               output
         nil)))) ;; signal that output has already been written to file
-#+end_src
-**** 1010
-#+begin_src emacs-lisp    
-  ;; edit 1010 queries and submit them via "tendo"
-  (require 'ob-xml-1010)
 #+end_src
 **** SQL
 #+begin_src emacs-lisp
@@ -1717,7 +1710,10 @@ stripping off \"-map\" from KEYMAP name."
           (sql-comint product params)))
       
       (av/require+ 'sql-indent)
-      (add-hook 'sql-mode-hook 'outline-minor-mode)))
+      (add-hook 'sql-mode-hook 'outline-minor-mode)
+  
+      ;; Default SQL dialect
+      (setq sql-product 'postgres)))
   
 #+end_src
    
