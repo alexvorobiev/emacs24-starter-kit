@@ -98,8 +98,14 @@ install packages.
 
 ** Recent files
 #+begin_src emacs-lisp
-  ;;; list-packages opens those
+  (require 'recentf)
+
+  (setq recentf-auto-cleanup 'never) ;; disable before we start recentf to avoid tramp files!
+
+  ;; list-packages opens those
   (setq recentf-exclude '("archive-contents" "elpa" "ido\.last"))
+  (recentf-mode 1)
+  
 #+end_src
 
 ** Put configuration files in registers
@@ -128,73 +134,75 @@ for this file) to jump to it.
 **** Base Ido: show recent files
      Go to recently-opened files first.
 #+begin_src emacs-lisp
-    (setq ido-enable-flex-matching t)
-    (setq ido-everywhere t)
-    (ido-mode 1)
-    (setq ido-use-filename-at-point 'guess
-          ido-create-new-buffer 'always
-          ido-use-virtual-buffers t
-          ido-use-url-at-point t)
-    
-    (setq ido-file-extensions-order '(".org" ".fb2" ".tex" ".txt" ".py" ".xml" ".el" ".ini" ".cfg" ".cnf"))
-    
-    ;;; Ignore the .aux extensions that TeX programs create 
-    (setq completion-ignored-extensions 
-          (cons "*.aux" completion-ignored-extensions)) 
-    
-    ;;; Ignore files defined in variable completion-ignored-extensions 
-    (setq ido-ignore-extensions t) 
-    (setq ido-default-buffer-method 'selected-window)
-    
-    (add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
-    (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
-    
-    (defun ido-sort-mtime ()
-      (setq ido-temp-list
-            (sort ido-temp-list 
-                  (lambda (a b)
-                    (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
-                          (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
-                      (if (= (nth 0 ta) (nth 0 tb))
-                          (> (nth 1 ta) (nth 1 tb))
-                        (> (nth 0 ta) (nth 0 tb)))))))
-      (ido-to-end  ;; move . files to end (again)
-       (delq nil (mapcar
-                  (lambda (x) (if (string-equal (substring x 0 1) ".") x))
-                  ido-temp-list))))
-    
-    ;;; Stops Ido searching for similar-named files if I use C-x C-s to create a new 
-    ;;; file and buffer 
-    (setq ido-auto-merge-work-directories-length -1) 
-    
-    ;;; Keep annoying buffers out of my face 
-    (setq ido-ignore-buffers (list (rx (or (and bos  " ") 
-                                           (and bos 
-                                                (or "*Completions*" 
-                                                    "*Shell Command Output*" 
-                                                    "*vc-diff*") 
-                                                eos))))) 
-    
-    ;;; Allow spaces when using ido-find-file 
-    (add-hook 'ido-make-file-list-hook 
-              (lambda () 
-                (define-key ido-file-dir-completion-map (kbd "SPC") 'self-insert-command))) 
+  (setq ido-enable-flex-matching t)
+  (setq ido-everywhere t)
+  (ido-mode 1)
+  (setq ido-use-filename-at-point 'guess
+        ido-create-new-buffer 'always
+        ido-use-virtual-buffers t
+        ido-use-url-at-point t)
+  
+  (setq ido-file-extensions-order '(".org" ".fb2" ".tex" ".txt" ".py" ".xml" ".el" ".ini" ".cfg" ".cnf"))
+  
+  ;; Ignore the .aux extensions that TeX programs create 
+  (setq completion-ignored-extensions 
+        (cons "*.aux" completion-ignored-extensions)) 
+  
+  ;; Ignore files defined in variable completion-ignored-extensions 
+  (setq ido-ignore-extensions t) 
+  (setq ido-default-buffer-method 'selected-window)
+  
+  (add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
+  (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
+  
+  (defun ido-sort-mtime ()
+    (setq ido-temp-list
+          (sort ido-temp-list 
+                (lambda (a b)
+                  (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
+                        (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
+                    (if (= (nth 0 ta) (nth 0 tb))
+                        (> (nth 1 ta) (nth 1 tb))
+                      (> (nth 0 ta) (nth 0 tb)))))))
+    (ido-to-end  ;; move . files to end (again)
+     (delq nil (mapcar
+                (lambda (x) (if (string-equal (substring x 0 1) ".") x))
+                ido-temp-list))))
+  
+  ;; Stops Ido searching for similar-named files if I use C-x C-s to create a new 
+  ;; file and buffer 
+  (setq ido-auto-merge-work-directories-length -1) 
+  
+  ;; Keep annoying buffers out of my face 
+  (setq ido-ignore-buffers (list (rx (or (and bos  " ") 
+                                         (and bos 
+                                              (or "*Completions*" 
+                                                  "*Shell Command Output*" 
+                                                  "*vc-diff*") 
+                                              eos))))) 
+  
+  ;; Allow spaces when using ido-find-file 
+  (add-hook 'ido-make-file-list-hook 
+            (lambda () 
+              (define-key ido-file-dir-completion-map (kbd "SPC") 'self-insert-command))) 
   
   ;; Use ~ to open files in home directory
   (add-hook 'ido-setup-hook
             (lambda ()
               ;; Go straight home
-     (define-key ido-file-completion-map
-       (kbd "~")
-       (lambda ()
-         (interactive)
-         (if (looking-back "/")
-             (insert "~/")
-           (call-interactively 'self-insert-command))))))
-
+              (define-key ido-file-completion-map
+                (kbd "~")
+                (lambda ()
+                  (interactive)
+                  (if (looking-back "/")
+                      (insert "~/")
+                    (call-interactively 'self-insert-command))))))
+  
   ;; Disable TRAMP
-  ;(custom-set-variables
-  ;              '(ido-enable-tramp-completion nil))
+  (custom-set-variables
+   '(ido-enable-tramp-completion nil))
+
+  (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)
 #+end_src
 
 **** Ido anywhere
@@ -891,11 +899,11 @@ for this file) to jump to it.
       (edit-server-start))
     
   ;; Keep emacs server running in background
-  (defun my-done ()
-    (interactive)                                                                                     
-    (server-edit)
-    (make-frame-invisible nil t))                                                          
-  (global-set-key (kbd "C-x C-c") 'my-done)
+  ;(defun my-done ()
+  ;  (interactive)                                                                                     
+  ;  (server-edit)
+  ;  (make-frame-invisible nil t))                                                          
+  ;(global-set-key (kbd "C-x C-c") 'my-done)
     
 #+end_src
 ** Version control
@@ -954,9 +962,9 @@ for this file) to jump to it.
   ;; http://stackoverflow.com/questions/2494096/emacs-key-binding-fallback
   (defmacro define-key-with-fallback (keymap key def condition &optional mode)
     "Define key with fallback. Binds KEY to definition DEF in keymap KEYMAP, 
-  the binding is active when the CONDITION is true. Otherwise turns MODE off and
-  re-enables previous definition for KEY. If MODE is nil, tries to recover it by 
-  stripping off \"-map\" from KEYMAP name."
+    the binding is active when the CONDITION is true. Otherwise turns MODE off and
+    re-enables previous definition for KEY. If MODE is nil, tries to recover it by 
+    stripping off \"-map\" from KEYMAP name."
     `(define-key ,keymap ,key
        (lambda () (interactive)
          (if ,condition ,def
@@ -972,6 +980,18 @@ for this file) to jump to it.
   
   (av/require+ 'outorg)
   (av/require+ 'navi-mode)
+  
+  ;; Untile outshine is fixed, use this
+  (outshine-define-key-with-fallback outline-minor-mode-map (kbd "TAB")
+                                     (outline-cycle arg)(outline-on-heading-p))
+  (outshine-define-key-with-fallback outline-minor-mode-map (kbd "M-RET")
+                                     (outshine-insert-heading)(outline-on-heading-p))
+  (outshine-define-key-with-fallback outline-minor-mode-map (kbd "M-S-<left>")
+                                     (outline-promote)(outline-on-heading-p))
+  (outshine-define-key-with-fallback outline-minor-mode-map (kbd "M-S-<right>")
+                                     (outline-demote)(outline-on-heading-p))
+  (define-key outline-minor-mode-map (kbd "<backtab>") 'outshine-cycle-buffer)
+
 #+end_src
 *** Imenu
     #+begin_src emacs-lisp :tangle "no"
