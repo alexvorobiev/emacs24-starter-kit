@@ -254,7 +254,6 @@ interested in the actual code implementing the starter kit.
     (require 'ffap)
     (require 'uniquify)
     (require 'ansi-color)
-    (require 'recentf)
   #+end_src
 
 - ELPA archive repositories and two packages to install by default.
