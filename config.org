@@ -582,7 +582,7 @@ for this file) to jump to it.
 **** Enhancements
 #+begin_src emacs-lisp
   (av/require+ 'dired+)
-  (av/require+ 'icicles) ;; required by dired+
+;;  (av/require+ 'icicles) ;; required by dired+
   (define-key ctl-x-map   "d" 'diredp-dired-files)
   (define-key ctl-x-4-map "d" 'diredp-dired-files-other-window)
 
@@ -760,127 +760,165 @@ for this file) to jump to it.
   
 #+end_src
    
-** Emacs on Windows 
-#+begin_src emacs-lisp
+** Emacs on Windows
+   :PROPERTIES:
+   :header-args: :tangle (if (eq system-type 'windows-nt) "yes" "no")
+   :END:
+   The default value of :tangle is set in properties here for all the
+   code blocks in this section.
+*** The running-ntemacs variable
+#+begin_src emacs-lisp :tangle "yes"
   (defvar running-ntemacs nil)
 #+end_src
-#+begin_src emacs-lisp :tangle (if (eq system-type 'windows-nt) "yes" "no")
+*** Macro to add a directory to executable paths
+#+begin_src emacs-lisp
+  (defmacro add-binary-path (name root-dir bin-dir &optional add-system-path)
+    (let* ((root-var-name (concat name "-root"))
+           (bin-var-name (concat name "-bin"))
+           (root-var (intern root-var-name))
+           (bin-var (intern bin-var-name)))
+      (list 'progn
+            `(defvar ,root-var ,root-dir)
+            `(defvar ,bin-var
+               (concat ,root-var "/" ,bin-dir))
+            `(add-to-list 'exec-path ,bin-var)
+            (when add-system-path
+              `(setenv "PATH" (concat ,bin-var ";"
+                                      (getenv "PATH")))))))
+#+end_src
+*** Gnuwin32
+   Run download.bat from [[http://gnuwin32.sourceforge.net/][GnuWin32]], then install.bat c:\gnuwin32
+#+begin_src emacs-lisp 
   (setq running-ntemacs t)
-  ;; (when running-ntemacs                 
-  ;;   (require 'ntemacs-config))
+  (add-binary-path "gnuwin32" "c:/gnuwin32" "bin")
+#+end_src
+*** Git
+    Git has its own set of binaries (from MSYS)
+#+begin_src emacs-lisp
+  (add-binary-path "git" (expand-file-name "~/tools/Git") "bin" t)
   
-    ;;; Gnuwin32
-    ;;; http://getgnuwin32.sourceforge.net to download configuration
-    ;;; scripts
-    ;;; download.bat
-    ;;; install.bat c:\gnuwin32
-  
-  (setq gnuwin32-root "c:/gnuwin32")
-  (setq gnuwin32-bin (concat gnuwin32-root "/bin"))
-                                          ;(setenv "HOME" (concat cygwin-root "/home/eric"))
-  
-    ;;; That would probably confuse cygwin
-  ;;(setenv "PATH" (concat gnuwin32-bin ";" (getenv "PATH")))
-  
-  (setq exec-path (cons gnuwin32-bin exec-path))
-  
-  (defun my-shell-setup ()
-    "For Cygwin bash under Emacs 20"
-    (setq comint-scroll-show-maximum-output 'this)
-    (make-variable-buffer-local 'comint-completion-addsuffix)
-    (set-buffer-process-coding-system 'undecided-unix 'undecided-unix)
-    
-    (setq comint-completion-addsuffix t)
-    ;; (setq comint-process-echoes t) ;; reported that this is no longer needed
-    (setq comint-eol-on-send t)
-    (setq w32-quote-process-args ?\"))
-  
-  (add-hook 'shell-mode-hook 'my-shell-setup)
-  
-  (setq cygwin-root "c:/cygwin")
-  (setq cygwin-bin (concat cygwin-root "/bin"))
-  (setq cygwin-local-bin (concat cygwin-root "/usr/local/bin"))
-  
-  (setq user-bin (expand-file-name "~/bin"))
-                                          ;(setenv "HOME" (concat cygwin-root "/home/eric"))
-  (setenv "PATH"
-          (concat user-bin ";" cygwin-local-bin ";" cygwin-bin ";" (getenv "PATH")))
-  (setenv "CYGWIN" "nodosfilewarning")
-  (setenv "LC_ALL" "C")
-  (setenv "LANG" "C")
-  
-  ;;(setq exec-path (cons cygwin-bin exec-path))
-    ;;; Append
-  (add-to-list 'exec-path cygwin-bin t)
-  
-  (eval-after-load 'info
-    '(add-to-list 'Info-default-directory-list (concat cygwin-root "/usr/share/info/")))
-  
-  ;;(setq shell-file-name "bash")
-  ;;(setq explicit-shell-file-name "bash")
-  
-  (setq ls-lisp-use-insert-directory-program t)      ;; use external ls
-  (setq insert-directory-program "c:/cygwin/bin/ls") ;; ls program name
-  
-  (av/require+ 'cygwin-mount)
-  (require 'setup-cygwin)
-  
-  (when
-    (require 'w32-symlinks nil t)
-    (setq w32-symlinks-handle-shortcuts t))
-  
-  (defconst cygwin-site-lisp (concat cygwin-root "/usr/share/emacs/site-lisp/"))
-  (add-to-list 'load-path cygwin-site-lisp)
-  
-                                          ;(add-to-list 'load-path site-lisp)
-  
-  ;; Git has its own set of binaries (from MSYS)
-  (add-to-list 'exec-path (expand-file-name "~/tools/Git/bin"))
-  (setenv "PATH"
-          (concat (expand-file-name "~/tools/Git/bin") ";"  (getenv "PATH")))
   ;; choose this if Cygwin gets confused
-  ;(add-to-list 'exec-path "~/tools/Git/cmd")
+  ;;(add-binary-path "git" (expand-file-name "~/tools/Git") "cmd")
   
-  ;; setting the PC keyboard's various keys to Super or Hyper
-  ;; will NOT override system shortcuts http://xahlee.info/mswin/windows_key_shortcuts.html
-  (setq w32-pass-lwindow-to-system nil
-        w32-pass-rwindow-to-system nil
-        w32-pass-apps-to-system nil
-        w32-lwindow-modifier 'super ;; Left Windows key
-        w32-rwindow-modifier 'super ;; Right Windows key
-        w32-apps-modifier 'hyper) ;; Menu key
-  
-  ;; redefine this function (from subr.el) to not escape colons
-  (defun shell-quote-argument (argument)
-    "Quote ARGUMENT for passing as argument to an inferior shell."
-    (if (or (eq system-type 'ms-dos)
-            (and (eq system-type 'windows-nt) (w32-shell-dos-semantics)))
-        ;; Quote using double quotes, but escape any existing quotes in
-        ;; the argument with backslashes.
-        (let ((result "")
-              (start 0)
-              end)
-          (if (or (null (string-match "[^\"]" argument))
-                  (< (match-end 0) (length argument)))
-              (while (string-match "[\"]" argument start)
-                (setq end (match-beginning 0)
-                      result (concat result (substring argument start end)
-                                     "\\" (substring argument end (1+ end)))
-                      start (1+ end))))
-          (concat "\"" result (substring argument start) "\""))
-      (if (equal argument "")
-          "''"
-        ;; Quote everything except POSIX filename characters.
-        ;; This should be safe enough even for really weird shells.
-        (replace-regexp-in-string "\n" "'\n'"
-                                  (replace-regexp-in-string "[^-0-9a-zA-Z_./\n:]" "\\\\\\&" argument)))))
-  
-  
+#+end_src
+*** EZwinports
+    [[http://sourceforge.net/projects/ezwinports/files/][ezwinports]]
+#+begin_src emacs-lisp
+  (add-binary-path "ezwinports" "c:/ezwinports" "bin" t) ;cygwin may get confused
+#+end_src
+*** Cygwin
+#+begin_src emacs-lisp :tangle "no"  
+    (defun my-shell-setup ()
+      "For Cygwin bash under Emacs 20"
+      (setq comint-scroll-show-maximum-output 'this)
+      (make-variable-buffer-local 'comint-completion-addsuffix)
+      (set-buffer-process-coding-system 'undecided-unix 'undecided-unix)
+      
+      (setq comint-completion-addsuffix t)
+      ;; (setq comint-process-echoes t) ;; reported that this is no longer needed
+      (setq comint-eol-on-send t)
+      (setq w32-quote-process-args ?\"))
+    
+    (add-hook 'shell-mode-hook 'my-shell-setup)
+    
+    (setq cygwin-root "c:/cygwin")
+    (setq cygwin-bin (concat cygwin-root "/bin"))
+    (setq cygwin-local-bin (concat cygwin-root "/usr/local/bin"))
+    
+    (setq user-bin (expand-file-name "~/bin"))
+                                            ;(setenv "HOME" (concat cygwin-root "/home/eric"))
+    (setenv "PATH"
+            (concat user-bin ";" cygwin-local-bin ";" cygwin-bin ";" (getenv "PATH")))
+    (setenv "CYGWIN" "nodosfilewarning")
+    (setenv "LC_ALL" "C")
+    (setenv "LANG" "C")
+    
+    ;;(setq exec-path (cons cygwin-bin exec-path))
+      ;;; Append
+    (add-to-list 'exec-path cygwin-bin t)
+    
+    (eval-after-load 'info
+      '(add-to-list 'Info-default-directory-list (concat cygwin-root "/usr/share/info/")))
+    
+    ;;(setq shell-file-name "bash")
+    ;;(setq explicit-shell-file-name "bash")
+    
+    (setq ls-lisp-use-insert-directory-program t)      ;; use external ls
+    (setq insert-directory-program "c:/cygwin/bin/ls") ;; ls gram name
+    
+    (av/require+ 'cygwin-mount)
+    (require 'setup-cygwin)
+
+    (defconst cygwin-site-lisp (concat cygwin-root "/usr/share/emacs/site-lisp/"))
+    (add-to-list 'load-path cygwin-site-lisp)
+#+end_src
+*** Everything else
+    No extra paths should be configured in this section
+#+begin_src emacs-lisp
+    (when
+      (require 'w32-symlinks nil t)
+      (setq w32-symlinks-handle-shortcuts t))
+    
+                                            ;(add-to-list 'load-path site-lisp)
+    
+    
+    ;; setting the PC keyboard's various keys to Super or Hyper
+    ;; will NOT override system shortcuts http://xahlee.info/mswin/windows_key_shortcuts.html
+    (setq w32-pass-lwindow-to-system nil
+          w32-pass-rwindow-to-system nil
+          w32-pass-apps-to-system nil
+          w32-lwindow-modifier 'super ;; Left Windows key
+          w32-rwindow-modifier 'super ;; Right Windows key
+          w32-apps-modifier 'hyper) ;; Menu key
+    
+    ;; redefine this function (from subr.el) to not escape colons
+    (defun shell-quote-argument (argument)
+      "Quote ARGUMENT for passing as argument to an inferior shell."
+      (if (or (eq system-type 'ms-dos)
+              (and (eq system-type 'windows-nt) (w32-shell-dos-semantics)))
+          ;; Quote using double quotes, but escape any existing quotes in
+          ;; the argument with backslashes.
+          (let ((result "")
+                (start 0)
+                end)
+            (if (or (null (string-match "[^\"]" argument))
+                    (< (match-end 0) (length argument)))
+                (while (string-match "[\"]" argument start)
+                  (setq end (match-beginning 0)
+                        result (concat result (substring argument start end)
+                                       "\\" (substring argument end (1+ end)))
+                        start (1+ end))))
+            (concat "\"" result (substring argument start) "\""))
+        (if (equal argument "")
+            "''"
+          ;; Quote everything except POSIX filename characters.
+          ;; This should be safe enough even for really weird shells.
+          (replace-regexp-in-string "\n" "'\n'"
+                                    (replace-regexp-in-string "[^-0-9a-zA-Z_./\n:]" "\\\\\\&" argument)))))
 #+end_src
 
 ** Spell checking
 #+begin_src emacs-lisp
-  (setq-default ispell-program-name "aspell")
+    (cond ((executable-find "aspell")
+           (setq-default ispell-program-name "aspell"))
+          ((executable-find "hunspell")
+           (progn
+             (eval-after-load "ispell"
+               (progn
+                 (setq ispell-dictionary "american"
+                       ispell-extra-args '("-a" "-i" "utf-8")
+                       ispell-silently-savep t
+                       ispell-dictionary-alist
+                       '((nil ; default
+                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+                                                          "utf-8") nil utf-8)
+                         ("american" ; Yankee English
+                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+                                                          "utf-8") nil utf-8)
+                         ("british" ; British English
+                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
+                                                          "utf-8") nil utf-8)))))
+             (setq-default ispell-program-name "hunspell"))))
 #+end_src
 ** Emacs server
 #+begin_src emacs-lisp
