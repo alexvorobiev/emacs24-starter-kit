@@ -791,6 +791,7 @@ for this file) to jump to it.
 #+begin_src emacs-lisp 
   (setq running-ntemacs t)
   (add-binary-path "gnuwin32" "c:/gnuwin32" "bin")
+  (setq ls-lisp-use-insert-directory-program t)      ;; use external ls 
 #+end_src
 *** Git
     Git has its own set of binaries (from MSYS)
@@ -843,7 +844,6 @@ for this file) to jump to it.
     ;;(setq shell-file-name "bash")
     ;;(setq explicit-shell-file-name "bash")
     
-    (setq ls-lisp-use-insert-directory-program t)      ;; use external ls
     (setq insert-directory-program "c:/cygwin/bin/ls") ;; ls gram name
     
     (av/require+ 'cygwin-mount)
@@ -963,24 +963,26 @@ for this file) to jump to it.
 #+end_src
 *** Magit
 #+begin_src emacs-lisp
-    (use-package magit
-      :init (progn
-              (setq magit-git-executable "git")
-              
-              ;; full screen magit-status
-              
-              (defadvice magit-status (around magit-fullscreen activate)
-                (window-configuration-to-register :magit-fullscreen)
-                ad-do-it
-                (delete-other-windows))
-              
-              (defun magit-quit-session ()
-                "Restores the previous window configuration and kills the magit buffer"
-                (interactive)
-                (kill-buffer)
-                (jump-to-register :magit-fullscreen))
-
-              (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)))
+  ;; workaround for magithub
+  (defvar magit-log-edit-confirm-cancellation nil)
+    
+  (use-package magit
+    :init (progn
+            (setq magit-git-executable "git")
+  
+            ;; full screen magit-status
+            (defadvice magit-status (around magit-fullscreen activate)
+              (window-configuration-to-register :magit-fullscreen)
+              ad-do-it
+              (delete-other-windows))
+            
+            (defun magit-quit-session ()
+              "Restores the previous window configuration and kills the magit buffer"
+              (interactive)
+              (kill-buffer)
+              (jump-to-register :magit-fullscreen))
+  
+            (define-key magit-status-mode-map (kbd "q") 'magit-quit-session)))
 #+end_src
 ** Development
 *** Check syntax on the fly
