@@ -899,26 +899,26 @@ for this file) to jump to it.
 
 ** Spell checking
 #+begin_src emacs-lisp
+  (use-package ispell
+    :init
     (cond ((executable-find "aspell")
            (setq-default ispell-program-name "aspell"))
           ((executable-find "hunspell")
            (progn
-             (eval-after-load "ispell"
-               (progn
-                 (setq ispell-dictionary "american"
-                       ispell-extra-args '("-a" "-i" "utf-8")
-                       ispell-silently-savep t
-                       ispell-dictionary-alist
-                       '((nil ; default
-                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-                                                          "utf-8") nil utf-8)
-                         ("american" ; Yankee English
-                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-                                                          "utf-8") nil utf-8)
-                         ("british" ; British English
-                          "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
-                                                          "utf-8") nil utf-8)))))
-             (setq-default ispell-program-name "hunspell"))))
+             (setq ispell-dictionary "american"
+                   ispell-extra-args '("-a" "-i" "utf-8")
+                   ispell-silently-savep t
+                   ispell-dictionary-alist
+                   '((nil ; default
+                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+                                                      "utf-8") nil utf-8)
+                     ("american" ; Yankee English
+                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+                                                      "utf-8") nil utf-8)
+                     ("british" ; British English
+                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
+                                                      "utf-8") nil utf-8)))
+             (setq-default ispell-program-name "hunspell")))))
 #+end_src
 ** Emacs server
 #+begin_src emacs-lisp
