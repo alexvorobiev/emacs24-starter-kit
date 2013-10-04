@@ -1238,19 +1238,19 @@ for this file) to jump to it.
           ("j" "Projects" entry (file+datetree "~/org/projects.org")
            "* %?%^{category}p\nEntered on %U\n  %i\n  %a")
           ("n" "Note" entry (file "~/org/notes.org")
-           "* %?\n  Added: %U")
+           "* %?\n  %x\n  Added: %U")
           ("p" "Project log" entry (file+datetree
                                     (concat (av/input-subdirectory "~/prj")
                                             "/project.org"))
-           "* %?\n     Entered on %U\n  %i\n  %a")
+           "* %?\n  Entered on %U\n  %i%x\n  %a")
           ("h" "Project log (history)" entry (file+datetree+prompt
                                     (concat (av/input-subdirectory "~/prj")
                                             "/project.org"))
-           "* %?\n     Entered on %U\n  %i\n  %a")
+           "* %?\n  Entered on %U\n  %i%x\n  %a")
           ("o" "Project todo" entry (file+headline
                                      (concat (av/input-subdirectory "~/prj")
                                             "/project.org") "Tasks")
-           "* TODO %?\n  Entered on %U\n  %i\n  %a")))
+           "* TODO %?\n  Entered on %U\n  %i%x\n  %a")))
   
   (setq org-agenda-files (concatenate 'list org-agenda-files
                (let ((subdirs
