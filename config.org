@@ -1269,8 +1269,7 @@ for this file) to jump to it.
 
      #+begin_src emacs-lisp
        (defadvice org-capture-finalize (after delete-capture-frame activate)
-         "Advise capture-finalize to close the frame if it is the capture
-       frame"
+         "Advise capture-finalize to close the frame if it is the capture frame"
          (if (equal "capture" (frame-parameter nil 'name))
              (delete-frame)))
        
@@ -1285,7 +1284,9 @@ for this file) to jump to it.
          (make-frame '((name . "capture")))
          (select-frame-by-name "capture")
          (delete-other-windows)
-         (org-capture))
+         (flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+           (org-capture)))
+       
      #+end_src
 *** Mobile Org
 #+begin_src emacs-lisp
