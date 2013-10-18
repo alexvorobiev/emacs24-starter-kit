@@ -10,7 +10,7 @@ Things that don't fit anywhere else.
 
 Determine whether required packages are installed. If not, use ELPA to
 install them. Other dependencies are provided by Emacs 24.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp tangle "no"
   (dolist (package '(magit))
     (unless (package-installed-p package)
       (package-install package)))
