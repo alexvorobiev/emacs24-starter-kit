@@ -691,7 +691,7 @@ for this file) to jump to it.
 
   ;;; Hide minor modes
   (av/require+ 'diminish)
-  (diminish 'yas/minor-mode)
+;  (diminish 'yas/minor-mode)
   (diminish 'auto-fill-function)
 ;  (diminish 'flyspell-mode)
   (diminish 'abbrev-mode)
