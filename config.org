@@ -896,30 +896,39 @@ for this file) to jump to it.
 ** Spell checking
 *** ispell
 #+begin_src emacs-lisp
-  (use-package ispell
-    :init
-    (cond ((executable-find "aspell")
-           (setq-default ispell-program-name "aspell"))
-          ((executable-find "hunspell")
-           (progn
-             (setq ispell-dictionary "en_US"
-                   ispell-extra-args '("-a" "-i" "utf-8")
-                   ispell-silently-savep t
-                   ispell-dictionary-alist
-                   '((nil ; default
-                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-                                                      "utf-8") nil utf-8)
-                     ("en_US" ; Yankee English
-                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-                                                      "utf-8") nil utf-8)
-                     ("en_GB" ; British English
-                      "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
-                                                      "utf-8") nil utf-8)))
-             (setq-default ispell-program-name "hunspell")))))
+    (use-package ispell
+      :init
+      (cond ((executable-find "aspell")
+             (setq-default ispell-program-name "aspell"))
+            ((executable-find "hunspell")
+             (progn
+               (setq ispell-dictionary "en_US"
+;                     ispell-extra-args '("-a" "-i" "utf-8")
+;                     ispell-silently-savep t
+;                     ispell-dictionary-alist
+;                     '((nil ; default
+;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+;                                                        "utf-8") nil utf-8)
+;                       ("en_US" ; Yankee English
+;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
+;                                                        "utf-8") nil utf-8)
+;                       ("en_GB" ; British English
+;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
+;                                                        "utf-8") nil utf-8))
+)
+               (setq-default ispell-program-name "hunspell")
+  (require 'rw-language-and-country-codes)
+  (require 'rw-ispell)
+  (require 'rw-hunspell)
+  (custom-set-variables
+   ;'(rw-hunspell-dicpath-list '("C:/Program Files/hunspell/")) ;spaces or special characters may be problematic
+   '(rw-hunspell-make-dictionary-menu t)
+   '(rw-hunspell-use-rw-ispell t))
+  ))))
 #+end_src
 *** flyspell
     #+begin_src emacs-lisp
-      (add-hook 'text-mode-hook 'turn-on-flyspell)
+ ;     (add-hook 'text-mode-hook 'turn-on-flyspell)
     #+end_src
 ** Emacs server
 #+begin_src emacs-lisp
@@ -990,7 +999,7 @@ for this file) to jump to it.
 #+begin_src emacs-lisp
   (av/require+ 'flycheck)
   (add-hook 'prog-mode-hook 'flycheck-mode)
-  (add-hook 'text-mode-hook 'flycheck-mode)
+  ;(add-hook 'text-mode-hook 'flycheck-mode)
 #+end_src   
 *** Structure editing
 #+begin_src emacs-lisp
@@ -1370,7 +1379,8 @@ for this file) to jump to it.
      (sh . t)
      (emacs-lisp . t)
 ;     (xml-1010 . t) 
-     (sql . t)))
+     (sql . t)
+     (ditaa . t)))
   
   (setq org-src-fontify-natively t)
   (setq org-src-tab-acts-natively t)
