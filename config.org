@@ -896,35 +896,22 @@ for this file) to jump to it.
 ** Spell checking
 *** ispell
 #+begin_src emacs-lisp
-    (use-package ispell
-      :init
-      (cond ((executable-find "aspell")
-             (setq-default ispell-program-name "aspell"))
-            ((executable-find "hunspell")
-             (progn
-               (setq ispell-dictionary "en_US"
-;                     ispell-extra-args '("-a" "-i" "utf-8")
-;                     ispell-silently-savep t
-;                     ispell-dictionary-alist
-;                     '((nil ; default
-;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-;                                                        "utf-8") nil utf-8)
-;                       ("en_US" ; Yankee English
-;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_US" "-i"  
-;                                                        "utf-8") nil utf-8)
-;                       ("en_GB" ; British English
-;                        "[A-Za-z]" "[^A-Za-z]" "[']" t ("-d" "en_GB" "-i"  
-;                                                        "utf-8") nil utf-8))
-)
-               (setq-default ispell-program-name "hunspell")
-  (require 'rw-language-and-country-codes)
-  (require 'rw-ispell)
-  (require 'rw-hunspell)
-  (custom-set-variables
-   ;'(rw-hunspell-dicpath-list '("C:/Program Files/hunspell/")) ;spaces or special characters may be problematic
-   '(rw-hunspell-make-dictionary-menu t)
-   '(rw-hunspell-use-rw-ispell t))
-  ))))
+  (use-package ispell
+    :init
+    (cond ((executable-find "aspell")
+           (setq-default ispell-program-name "aspell"))
+          ((executable-find "hunspell")
+           (progn
+             (setq ispell-program-name
+                   (locate-file "hunspell" exec-path exec-suffixes 'file-executable-p))
+  
+             (setq
+              ispell-local-dictionary-alist
+              '(("en_US"
+                 "[[:alpha:]]"
+                 "[^[:alpha:]]"
+                 "[']" nil ("-r") nil utf-8)))
+             (ispell-change-dictionary "en_US" t) ))))
 #+end_src
 *** flyspell
     #+begin_src emacs-lisp
