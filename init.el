@@ -31,10 +31,16 @@
            (mapconcat #'(lambda (d) (delete-directory d t) d) to-delete "...ok\n")))
 
 
-;; org is special
+;; org is special, check if we have source tree or elpa package
+(setq custom-org-path 
+      (car
+       (remove nil
+               (mapcar #'(lambda (p)
+                           (car (file-expand-wildcards
+                                 (concat starter-kit-dir p))))
+                       '("src/org-mode/lisp" "elpa/org-plus-contrib-20*")))))
+
 ;; remove org-mode shipped with emacs from the load-path
-(setq custom-org-path (car (file-expand-wildcards
-                            (concat starter-kit-dir "elpa/org-plus-contrib-20*"))))
 (when custom-org-path 
   (setq load-path (remove-if (lambda (x) (string-match-p "org$" x)) load-path))
 
