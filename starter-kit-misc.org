@@ -128,15 +128,15 @@ it's possible aspell isn't in your path
 - This didn't work at first, possibly because cocoAspell was
   building its dictionary.  Now it seems to work fine.
 #+begin_src emacs-lisp :tangle no
-  (setq ispell-program-name "aspell"
-        ispell-dictionary "english"
-        ispell-dictionary-alist
-        (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
-                         ("-B" "-d" "english" "--dict-dir"
-                          "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
-                         nil iso-8859-1)))
-          `((nil ,@default)
-            ("english" ,@default))))
+;  (setq ispell-program-name "aspell"
+;        ispell-dictionary "english"
+;        ispell-dictionary-alist
+;        (let ((default '("[A-Za-z]" "[^A-Za-z]" "[']" nil
+;                         ("-B" "-d" "english" "--dict-dir"
+;                          "/Library/Application Support/cocoAspell/aspell6-en-6.0-0")
+;                         nil iso-8859-1)))
+;          `((nil ,@default)
+;            ("english" ,@default))))
 #+end_src
 
 ** Hippie expand: at times perhaps too hip

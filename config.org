@@ -229,7 +229,19 @@ for this file) to jump to it.
   ;; This is your old M-x.
   (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
 #+end_src
-
+*** Helm
+    #+begin_src emacs-lisp
+      (av/require+ 'helm)
+      
+      (require 'helm-config)
+      
+      ;; DWIM
+      (global-set-key (kbd "<f5>") 'helm-mini)
+      
+      ;; Replacement for Ido, smex, etc. But it looks like they need to be
+      ;; disabled first.
+      (helm-mode 1)
+    #+end_src
 ** Editing shortcuts
 *** Navigation 
 **** Sentence navigation
@@ -1585,6 +1597,12 @@ for this file) to jump to it.
   
   ;; Font for tt (monospace)
   (add-to-list 'org-latex-packages-alist '("" "zi4" nil))
+  
+  ;; Use utf8x for inputenc
+  (add-to-list 'org-latex-packages-alist '("utf8x" "inputenc" nil))
+  (setq org-latex-default-packages-alist 
+        (remove-if #'(lambda (x) (and (listp x) (string= (cadr x) "inputenc")))
+                   org-latex-default-packages-alist))
   
   ;; Use nicer tables
   (setq org-latex-tables-booktabs t
