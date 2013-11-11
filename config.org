@@ -474,12 +474,22 @@ for this file) to jump to it.
 ;  (show-paren-mode 1) ;smartparens does it now
 #+end_src
 ** Color theme
+   There is some weird conflict somewhere in the startup files that
+   forces imenu in the temporary buffer created by load-theme. This
+   code neutralizes the error thrown by imenu.
+   #+begin_src emacs-lisp
+     (defadvice imenu-default-create-index-function
+       (around imenu-error-catch activate)
+       "Catch the error safely"
+       (condition-case nil ad-do-it
+         (user-error (message "Imenu error caught and disposed of"))))
+   #+end_src
+
 #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
   ;;; Do not load in console mode - rely on terminal settings
   
   (av/require+ 'solarized-theme)
   ;(av/require+ 'zenburn-theme)
-;  (run-with-timer 1 nil 'load-theme 'solarized-dark t)
   (load-theme 'solarized-dark t)
   
   (set-face-attribute 'popup-tip-face 
