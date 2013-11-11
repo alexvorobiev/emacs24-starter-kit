@@ -462,6 +462,45 @@ for this file) to jump to it.
 ;  (show-paren-mode 1) ;smartparens does it now
 #+end_src
 ** Color theme
+
+  #+begin_src emacs-lisp
+  (defun imenu-default-create-index-function ()
+  "Default function to create an index alist of the current buffer.
+
+The most general method is to move point to end of buffer, then repeatedly call
+`imenu-prev-index-position-function' and `imenu-extract-index-name-function'.
+All the results returned by the latter are gathered into an index alist.
+This method is used if those two variables are non-nil.
+
+The alternate method, which is the one most often used, is to call
+`imenu--generic-function' with `imenu-generic-expression' as argument."
+  ;; These should really be done by setting imenu-create-index-function
+  ;; in these major modes.  But save that change for later.
+  (cond ((and imenu-prev-index-position-function
+	      imenu-extract-index-name-function)
+	 (let ((index-alist '()) (pos -1)
+	       name)
+	   (goto-char (point-max))
+	   ;; Search for the function
+	   (while (funcall imenu-prev-index-position-function)
+             (when (= pos (point))
+               (error "Infinite loop at %s:%d: imenu-prev-index-position-function does not move point" (buffer-name) pos))
+             (setq pos (point))
+	     (save-excursion
+	       (setq name (funcall imenu-extract-index-name-function)))
+	     (and (stringp name)
+ 		  ;; [ydi] updated for imenu-use-markers
+		  (push (cons name (if imenu-use-markers (point-marker) (point)))
+			index-alist)))
+	   index-alist))
+	;; Use generic expression if possible.
+	((and imenu-generic-expression)
+	 (imenu--generic-function imenu-generic-expression))
+	(t
+	 (message "This buffer cannot use `imenu-default-create-index-function' %s" (buffer-name)))))
+
+  #+end_src
+
 #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
   ;;; Do not load in console mode - rely on terminal settings
   
