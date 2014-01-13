@@ -463,6 +463,11 @@ for this file) to jump to it.
   (define-key Apropos-Prefix (kbd "v")   'apropos-variable)
   (define-key Apropos-Prefix (kbd "C-v") 'apropos-value)
 #+end_src
+**** Discover mode
+     #+begin_src emacs-lisp
+       (av/require+ 'discover)
+       (global-discover-mode 1)
+     #+end_src
 ** Change "yes or no" to "y or n"
     #+begin_src emacs-lisp
       (fset 'yes-or-no-p 'y-or-n-p)
@@ -1241,6 +1246,30 @@ for this file) to jump to it.
               ("I" "#+include %file ?" "<include file=%file markup=\"?\">"))))
      #+end_src
 
+**** Copy image from clipboard using ImageMagick
+     #+begin_src emacs-lisp
+       (defvar org-clipboard-image-suffix 0)
+       (make-variable-buffer-local 'org-clipboard-image-suffix)
+       (setq-default org-clipboard-image-suffix 0)
+       
+       (defcustom org-clipboard-image-dir "images"
+         "Location of image files copied from clipboard.")
+       
+       (defun org-insert-clipboard-image ()
+         (interactive)
+         (incf org-clipboard-image-suffix)
+         (unless (file-directory-p org-clipboard-image-dir)
+           (make-directory org-clipboard-image-dir t))
+         (let* ((image-file
+                 (concat (file-name-base (buffer-file-name))
+                         "_"
+                         (format "%d" org-clipboard-image-suffix)
+                         ".png"))
+                (exit-status 
+                 (call-process "convert" nil nil nil 
+                               "clipboard:" image-file)))
+           (org-insert-link nil (concat "file:" image-file) "")))
+     #+end_src
 *** Org protocol and capture
 **** Templates and agenda files
 #+begin_src emacs-lisp
