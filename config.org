@@ -121,7 +121,7 @@ for this file) to jump to it.
 *** Ido-mode
 **** Base Ido: show recent files
      Go to recently-opened files first.
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
   (setq ido-enable-flex-matching t)
   (setq ido-everywhere t)
   (ido-mode 1)
@@ -1385,7 +1385,7 @@ for this file) to jump to it.
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((R . t)
-     (sh . t)
+     (shell . t)
      (emacs-lisp . t)
 ;     (xml-1010 . t) 
      (sql . t)
@@ -1424,7 +1424,7 @@ for this file) to jump to it.
 #+end_src
 **** Screen
 #+begin_src emacs-lisp
-    (require 'ob-sh)
+    (require 'ob-shell)
     (require 'ob-screen) ;; requires screen, terminal
     
     (setq org-babel-default-header-args:screen
@@ -1607,6 +1607,8 @@ for this file) to jump to it.
   
   ;; Font for tt (monospace)
   (add-to-list 'org-latex-packages-alist '("" "zi4" nil))
+
+  (add-to-list 'org-latex-packages-alist '("nofligs" "verdana" nil))
   
   ;; Use utf8x for inputenc
   (add-to-list 'org-latex-packages-alist '("utf8x" "inputenc" nil))
