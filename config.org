@@ -86,16 +86,6 @@ install packages.
 #+end_src
 
 * General configuration
-** Add my elisp directory and other files
-
-#+begin_src emacs-lisp
-  (add-to-list 'load-path "~/elisp")
-  (add-to-list 'exec-path (expand-file-name "~/bin"))
-  (setenv "PATH" (concat (getenv "PATH") ";" (expand-file-name "~/bin")))
-  ;;(add-to-list 'load-path "~/elisp/packages-emacs")
-  ;;(load-file "~/.emacs.secrets")
-#+end_src
-
 ** Put configuration files in registers
 Registers allow you to jump to a file or other location quickly. Use
 =C-x r j= followed by the letter of the register (i for =init.el=, I
@@ -849,46 +839,49 @@ for this file) to jump to it.
    The default value of :tangle is set in properties here for all the
    code blocks in this section.
 *** The running-ntemacs variable
-#+begin_src emacs-lisp :tangle "yes"
-  (defvar running-ntemacs nil)
-#+end_src
+    Tangle always
+    #+begin_src emacs-lisp :tangle "yes"
+      (defvar running-ntemacs (eq system-type 'windows-nt))
+    #+end_src
 *** Macro to add a directory to executable paths
-#+begin_src emacs-lisp
-  (defmacro add-binary-path (name root-dir bin-dir &optional add-system-path)
-    (let* ((root-var-name (concat name "-root"))
-           (bin-var-name (concat name "-bin"))
-           (root-var (intern root-var-name))
-           (bin-var (intern bin-var-name)))
-      (list 'progn
-            `(defvar ,root-var ,root-dir)
-            `(defvar ,bin-var
-               (concat ,root-var "/" ,bin-dir))
-            `(add-to-list 'exec-path ,bin-var)
-            (when add-system-path
-              `(setenv "PATH" (concat ,bin-var ";"
-                                      (getenv "PATH")))))))
-#+end_src
+    #+begin_src emacs-lisp
+      (defmacro add-binary-path (name root-dir bin-dir &optional add-system-path)
+        (let* ((root-var-name (concat name "-root"))
+               (bin-var-name (concat name "-bin"))
+               (root-var (intern root-var-name))
+               (bin-var (intern bin-var-name)))
+          (list 'progn
+                `(defvar ,root-var ,root-dir)
+                `(defvar ,bin-var
+                   (concat ,root-var "/" ,bin-dir))
+                `(add-to-list 'exec-path ,bin-var)
+                (when add-system-path
+                  `(setenv "PATH" (concat ,bin-var ";"
+                                          (getenv "PATH")))))))
+    #+end_src
+*** Path to local executables
+    #+begin_src emacs-lisp
+      (add-binary-path "home" (expand-file-name "~"), "bin")
+    #+end_src
 *** Gnuwin32
-   Run download.bat from [[http://gnuwin32.sourceforge.net/][GnuWin32]], then install.bat c:\gnuwin32
-#+begin_src emacs-lisp 
-  (setq running-ntemacs t)
-  (add-binary-path "gnuwin32" "c:/gnuwin32" "bin")
-  (setq ls-lisp-use-insert-directory-program t)      ;; use external ls 
-#+end_src
+    Run download.bat from [[http://gnuwin32.sourceforge.net/][GnuWin32]], then install.bat c:\gnuwin32
+    #+begin_src emacs-lisp 
+      (add-binary-path "gnuwin32" "c:/gnuwin32" "bin")
+      (setq ls-lisp-use-insert-directory-program t)      ;; use external ls 
+    #+end_src
 *** Git
     Git has its own set of binaries (from MSYS)
-#+begin_src emacs-lisp
-  (add-binary-path "git" (expand-file-name "~/tools/Git") "bin" t)
+    #+begin_src emacs-lisp
+      (add-binary-path "git" (expand-file-name "~/tools/Git") "bin" t)
   
-  ;; choose this if Cygwin gets confused
-  ;;(add-binary-path "git" (expand-file-name "~/tools/Git") "cmd")
-  
-#+end_src
+      ;; choose this if Cygwin gets confused
+      ;;(add-binary-path "git" (expand-file-name "~/tools/Git") "cmd")
+    #+end_src
 *** EZwinports
     [[http://sourceforge.net/projects/ezwinports/files/][ezwinports]]
-#+begin_src emacs-lisp
-  (add-binary-path "ezwinports" "c:/ezwinports" "bin" t) ;cygwin may get confused
-#+end_src
+    #+begin_src emacs-lisp
+      (add-binary-path "ezwinports" "c:/ezwinports" "bin" t) ;cygwin may get confused
+    #+end_src
 *** Cygwin
 #+begin_src emacs-lisp :tangle "no"  
     (defun my-shell-setup ()
@@ -936,48 +929,48 @@ for this file) to jump to it.
 #+end_src
 *** Everything else
     No extra paths should be configured in this section
-#+begin_src emacs-lisp
-    (when
-      (require 'w32-symlinks nil t)
-      (setq w32-symlinks-handle-shortcuts t))
-    
-                                            ;(add-to-list 'load-path site-lisp)
-    
-    
-    ;; setting the PC keyboard's various keys to Super or Hyper
-    ;; will NOT override system shortcuts http://xahlee.info/mswin/windows_key_shortcuts.html
-    (setq w32-pass-lwindow-to-system nil
-          w32-pass-rwindow-to-system nil
-          w32-pass-apps-to-system nil
-          w32-lwindow-modifier 'super ;; Left Windows key
-          w32-rwindow-modifier 'super ;; Right Windows key
-          w32-apps-modifier 'hyper) ;; Menu key
-    
-    ;; redefine this function (from subr.el) to not escape colons
-    (defun shell-quote-argument (argument)
-      "Quote ARGUMENT for passing as argument to an inferior shell."
-      (if (or (eq system-type 'ms-dos)
-              (and (eq system-type 'windows-nt) (w32-shell-dos-semantics)))
-          ;; Quote using double quotes, but escape any existing quotes in
-          ;; the argument with backslashes.
-          (let ((result "")
-                (start 0)
-                end)
-            (if (or (null (string-match "[^\"]" argument))
-                    (< (match-end 0) (length argument)))
-                (while (string-match "[\"]" argument start)
-                  (setq end (match-beginning 0)
-                        result (concat result (substring argument start end)
-                                       "\\" (substring argument end (1+ end)))
-                        start (1+ end))))
-            (concat "\"" result (substring argument start) "\""))
-        (if (equal argument "")
-            "''"
-          ;; Quote everything except POSIX filename characters.
-          ;; This should be safe enough even for really weird shells.
-          (replace-regexp-in-string "\n" "'\n'"
-                                    (replace-regexp-in-string "[^-0-9a-zA-Z_./\n:]" "\\\\\\&" argument)))))
-#+end_src
+    #+begin_src emacs-lisp
+      (when
+        (require 'w32-symlinks nil t)
+        (setq w32-symlinks-handle-shortcuts t))
+      
+                                              ;(add-to-list 'load-path site-lisp)
+      
+      
+      ;; setting the PC keyboard's various keys to Super or Hyper
+      ;; will NOT override system shortcuts http://xahlee.info/mswin/windows_key_shortcuts.html
+      (setq w32-pass-lwindow-to-system nil
+            w32-pass-rwindow-to-system nil
+            w32-pass-apps-to-system nil
+            w32-lwindow-modifier 'super ;; Left Windows key
+            w32-rwindow-modifier 'super ;; Right Windows key
+            w32-apps-modifier 'hyper) ;; Menu key
+      
+      ;; redefine this function (from subr.el) to not escape colons
+      (defun shell-quote-argument (argument)
+        "Quote ARGUMENT for passing as argument to an inferior shell."
+        (if (or (eq system-type 'ms-dos)
+                (and (eq system-type 'windows-nt) (w32-shell-dos-semantics)))
+            ;; Quote using double quotes, but escape any existing quotes in
+            ;; the argument with backslashes.
+            (let ((result "")
+                  (start 0)
+                  end)
+              (if (or (null (string-match "[^\"]" argument))
+                      (< (match-end 0) (length argument)))
+                  (while (string-match "[\"]" argument start)
+                    (setq end (match-beginning 0)
+                          result (concat result (substring argument start end)
+                                         "\\" (substring argument end (1+ end)))
+                          start (1+ end))))
+              (concat "\"" result (substring argument start) "\""))
+          (if (equal argument "")
+              "''"
+            ;; Quote everything except POSIX filename characters.
+            ;; This should be safe enough even for really weird shells.
+            (replace-regexp-in-string "\n" "'\n'"
+                                      (replace-regexp-in-string "[^-0-9a-zA-Z_./\n:]" "\\\\\\&" argument)))))
+    #+end_src
 
 ** Spell checking
 *** ispell
