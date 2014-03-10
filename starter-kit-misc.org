@@ -23,9 +23,9 @@ Things that don't fit anywhere else.
       font-lock-maximum-decoration t
       inhibit-startup-message t
       transient-mark-mode t
-      color-theme-is-global t
+;      color-theme-is-global t
       delete-by-moving-to-trash t
-      shift-select-mode nil
+;      shift-select-mode t
       truncate-partial-width-windows nil
       uniquify-buffer-name-style 'forward
       whitespace-style '(trailing lines space-before-tab
@@ -47,32 +47,17 @@ Things that don't fit anywhere else.
 (recentf-mode 1)
 #+end_src emacs-lisp
 
-** ido mode
-ido-mode is like magic pixie dust!
-#+srcname: starter-kit-loves-ido-mode
-#+begin_src emacs-lisp :tangle no
-(when (> emacs-major-version 21)
-  (ido-mode t)
-  (setq ido-enable-prefix nil
-        ido-enable-flex-matching t
-        ido-create-new-buffer 'always
-        ido-use-filename-at-point t
-        ido-max-prospects 10))
-#+end_src
-
 ** Other, spell checking, tabs, imenu and a coding hook
 #+begin_src emacs-lisp 
   (set-default 'indent-tabs-mode nil)
   (set-default 'indicate-empty-lines t)
-  (set-default 'imenu-auto-rescan t)
+;  (set-default 'imenu-auto-rescan t)
   
   (add-hook 'text-mode-hook 'turn-on-auto-fill)
-  (add-hook 'text-mode-hook 'turn-on-flyspell)
-  
+
   (defvar starter-kit-coding-hook nil
     "Hook that gets run on activation of any programming mode.")
   
-  (defalias 'yes-or-no-p 'y-or-n-p)
   ;; Seed the random-number generator
   (random t)
 #+end_src

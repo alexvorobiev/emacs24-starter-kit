@@ -238,7 +238,7 @@ interested in the actual code implementing the starter kit.
 - Load path etc.
   #+name: starter-kit-load-paths
   #+begin_src emacs-lisp
-    (add-to-list 'load-path starter-kit-dir)
+;    (add-to-list 'load-path starter-kit-dir)
     (setq autoload-file (concat starter-kit-dir "loaddefs.el"))
     (setq package-user-dir (concat starter-kit-dir "elpa"))
     (setq custom-file (concat starter-kit-dir "custom.el"))
@@ -359,10 +359,6 @@ everyone using the starter kit.
   (starter-kit-load "starter-kit-misc.org")
   #+end_src
 
-- Registers for jumping to commonly used files in [[file:starter-kit-registers.org][starter-kit-registers]]
-  #+begin_src emacs-lisp :tangle "no"
-  (starter-kit-load "starter-kit-registers.org")
-  #+end_src
 
 - [[http://code.google.com/p/yasnippet/][yasnippet]] is yet another snippet expansion system for Emacs.  It is
   inspired by TextMate's templating syntax.

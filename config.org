@@ -76,13 +76,6 @@ install packages.
 #+begin_src emacs-lisp
   (starter-kit-load "org")
   (starter-kit-load "lisp")
-
-  (require 'cl)
-#+end_src
-
-  Show-paren-mode misbehaves in my copy of emacs-starter-kit.
-#+begin_src emacs-lisp
-  (show-paren-mode -1)
 #+end_src
 
 * General configuration
@@ -669,6 +662,14 @@ for this file) to jump to it.
   (ad-activate 'shell-command)
           
 #+end_src
+
+**** Display subtrees inline
+     #+begin_src emacs-lisp
+       (av/require+ 'dired-subtree)
+          
+       (define-key dired-mode-map
+         (kbd "M-I") 'dired-subtree-insert)
+     #+end_src
 *** Tramp and editing files over SSH
     #+begin_src emacs-lisp
       (eval-after-load 'tramp
@@ -767,6 +768,8 @@ for this file) to jump to it.
   (diminish 'auto-fill-function)
 ;  (diminish 'flyspell-mode)
   (diminish 'abbrev-mode)
+  (diminish 'helm-mode)
+  (diminish 'undo-tree-mode)
 #+end_src
 *** Modeline
     #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
@@ -1064,7 +1067,7 @@ for this file) to jump to it.
 *** Check syntax on the fly
 #+begin_src emacs-lisp
   (av/require+ 'flycheck)
-  (add-hook 'prog-mode-hook 'flycheck-mode)
+  ;(add-hook 'prog-mode-hook 'flycheck-mode)
   ;(add-hook 'text-mode-hook 'flycheck-mode)
 #+end_src   
 *** Structure editing
@@ -1107,7 +1110,8 @@ for this file) to jump to it.
   (outshine-define-key-with-fallback outline-minor-mode-map (kbd "M-S-<right>")
                                      (outline-demote)(outline-on-heading-p))
   (define-key outline-minor-mode-map (kbd "<backtab>") 'outshine-cycle-buffer)
-
+  
+  (add-hook 'prog-mode-hook 'outline-minor-mode)
 #+end_src
 *** Imenu
     #+begin_src emacs-lisp :tangle "no"
@@ -1815,11 +1819,13 @@ for this file) to jump to it.
     "View *R* objects in a dired-like buffer." t)
   
   (av/require+ 'ess-smart-underscore)
-
+  
   ;; ess-R-dv-ctable shows table in other buffer. 
   ;; ess-R-dv-pprint shows pretty-printed text in other buffer
   (av/require+ 'ess-R-data-view)
-
+  
+  ;; ess-R-object-popup runs str() or summary()
+  (av/require+ 'ess-R-object-popup)
   
   ;; open shell, then run
   ;;  ~/bin/plink -pw parol vorobiea@ral-prod06

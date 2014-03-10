@@ -4,6 +4,12 @@
 ;;
 ;; This is the first thing to get loaded.
 ;;
+;;; Commentary:
+
+;;; Code:
+
+;; The earlier this is done the better
+(setq gc-cons-threshold 20000000)
 
 ;; remember this directory
 (setq starter-kit-dir
