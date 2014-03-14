@@ -63,7 +63,7 @@ Things that don't fit anywhere else.
 #+end_src
 
 *** functions for prettier source code
-#+begin_src emacs-lisp
+#+begin_src emacs-lisp :tangle no
 (defun starter-kit-pretty-lambdas ()
   (font-lock-add-keywords
    nil `(("(\\(lambda\\>\\)"

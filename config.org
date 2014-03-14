@@ -516,10 +516,10 @@ for this file) to jump to it.
       (defalias 'yes-or-no-p 'y-or-n-p)
     #+end_src
 ** Visual aids
-#+begin_src emacs-lisp
-;(message "vis")
-;  (show-paren-mode 1) ;smartparens does it now
-#+end_src
+   #+begin_src emacs-lisp
+     (av/require+ 'pretty-mode)
+     (global-pretty-mode 1)
+   #+end_src
 ** Color theme
    There is some weird conflict somewhere in the startup files that
    forces imenu in the temporary buffer created by load-theme. This
@@ -1691,10 +1691,13 @@ for this file) to jump to it.
   (add-to-list 'org-latex-packages-alist '("automark,nouppercase" "scrpage2" nil))
   
   ;; Font for tt (monospace)
-  (add-to-list 'org-latex-packages-alist '("" "zi4" nil))
-
-  (add-to-list 'org-latex-packages-alist '("nofligs" "verdana" nil))
+  ;(add-to-list 'org-latex-packages-alist '("" "zi4" nil))
+  (add-to-list 'org-latex-packages-alist '("" "inconsolata" nil))
   
+  ;; Font for ss
+  ;(add-to-list 'org-latex-packages-alist '("nofligs" "verdana" nil))
+  (add-to-list 'org-latex-packages-alist '("scaled" "helvet" nil))
+
   ;; Use utf8x for inputenc
   (add-to-list 'org-latex-packages-alist '("utf8x" "inputenc" nil))
   (setq org-latex-default-packages-alist 
@@ -1705,14 +1708,14 @@ for this file) to jump to it.
   (setq org-latex-tables-booktabs t
         org-latex-default-table-environment "longtable")
   
-      ;;; Minted
+  ;; Minted
   (setq org-latex-listings 'minted)
   (add-to-list 'org-latex-packages-alist '("" "minted" nil)) ;nil means "don't use for previewing"
   
   (add-to-list 'org-latex-minted-langs '(xml-1010 "xml"))
   (add-to-list 'org-latex-minted-langs '(R "r"))
   
-      ;;; Tables
+  ;; Tables
   (add-to-list 'org-latex-packages-alist '("" "booktabs" nil))
   
   ;; minted needs -shell-escape command line option
@@ -1721,7 +1724,29 @@ for this file) to jump to it.
                   (replace-regexp-in-string "pdflatex" "pdflatex -shell-escape" str))
                 org-latex-pdf-process))
   
-      ;;; Cygwin pdflatex needs unix-style paths
+  ;; Use fancyvrb for verbatim environment
+  (add-to-list 'org-latex-packages-alist '("" "fancyvrb" nil))
+  
+  (defun org-latex-filter-fancyvrb (text backend info)
+    "Convert begin/end{verbatim} to begin/end{Verbatim}.
+      Allows use of the fancyvrb latex package."
+    (when (org-export-derived-backend-p backend 'latex)
+      (replace-regexp-in-string
+       "\\\\\\(begin\\|end\\){verbatim}"
+       "\\\\\\1{Verbatim}[frame=leftline,fontsize=\\\\relsize{-2}]"
+       text)))
+  
+  (add-to-list 'org-export-filter-example-block-functions
+               'org-latex-filter-fancyvrb)
+                                          ;(add-to-list 'org-export-filter-fixed-width-functions
+                                          ;             'my-latex-custom-verbatim)
+                                          ;(add-to-list 'org-export-filter-quote-section-functions
+                                          ;             'my-latex-custom-verbatim)
+                                          ;(add-to-list 'org-export-filter-src-block-functions
+                                          ;             'my-latex-custom-verbatim)
+                                          ;(add-to-list 'org-export-filter-table-functions
+                                          ;             'my-latex-custom-verbatim)
+        ;;; Cygwin pdflatex needs unix-style paths
   ;; (when (string-match "Cygwin" (shell-command-to-string "pdflatex -v"))
   ;;   (progn
   ;;     (setq org-latex-pdf-process 
