@@ -42,11 +42,6 @@ Things that don't fit anywhere else.
 (auto-compression-mode t)
 #+end_src
 
-** Save a list of recent files visited.
-#+begin_src emacs-lisp 
-(recentf-mode 1)
-#+end_src emacs-lisp
-
 ** Other, spell checking, tabs, imenu and a coding hook
 #+begin_src emacs-lisp 
   (set-default 'indent-tabs-mode nil)
@@ -60,16 +55,6 @@ Things that don't fit anywhere else.
   
   ;; Seed the random-number generator
   (random t)
-#+end_src
-
-*** functions for prettier source code
-#+begin_src emacs-lisp :tangle no
-(defun starter-kit-pretty-lambdas ()
-  (font-lock-add-keywords
-   nil `(("(\\(lambda\\>\\)"
-          (0 (progn (compose-region (match-beginning 1) (match-end 1)
-                                    ,(make-char 'greek-iso8859-7 107))
-                    nil))))))
 #+end_src
 
 ** Hippie expand: at times perhaps too hip

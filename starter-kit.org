@@ -249,7 +249,7 @@ interested in the actual code implementing the starter kit.
   session.
   #+name: starter-kit-load-on-startup
   #+begin_src emacs-lisp
-    (require 'cl)
+;    (require 'cl)
     (require 'saveplace)
     (require 'ffap)
     (require 'uniquify)
@@ -261,8 +261,9 @@ interested in the actual code implementing the starter kit.
     (setq package-archives
           '(("gnu"         . "http://elpa.gnu.org/packages/")
             ("original"    . "http://tromey.com/elpa/")
-            ("org"         . "http://orgmode.org/elpa/")
-            ("marmalade"   . "http://marmalade-repo.org/packages/")))
+;            ("org"         . "http://orgmode.org/elpa/")
+;            ("marmalade"   . "http://marmalade-repo.org/packages/"))
+    ))
     (package-initialize)
     
     (defvar starter-kit-packages
