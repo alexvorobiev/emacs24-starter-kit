@@ -74,124 +74,32 @@ install packages.
 * Load other parts of the Emacs Starter Kit
 
 #+begin_src emacs-lisp
-  (starter-kit-load "org")
   (starter-kit-load "lisp")
 #+end_src
 
 * General configuration
 ** Put configuration files in registers
-Registers allow you to jump to a file or other location quickly. Use
-=C-x r j= followed by the letter of the register (i for =init.el=, I
-for this file) to jump to it.
+   Registers allow you to jump to a file or other location quickly.
+   Use =C-x r j= followed by the letter of the register (i for
+   =init.el=, I for this file) to jump to it.
 
-#+begin_src emacs-lisp :results silent
-  (dolist
-      (r `((?i (file . ,(concat starter-kit-dir "init.el")))
-           (?I (file . ,(concat starter-kit-dir "config.org")))
-           (?s (file . ,(let* ((system (system-name))
-                               (org (expand-file-name (concat system ".org") starter-kit-dir))
-                               (el  (expand-file-name (concat system ".el") starter-kit-dir))
-                               (dir (expand-file-name system starter-kit-dir)))
-                          (cond
-                           ((file-exists-p org) org)
-                           ((file-exists-p el)  el)
-                           (t dir)))))
-           ))
-    (set-register (car r) (cadr r)))
-#+end_src
+   #+begin_src emacs-lisp :results silent
+     (dolist
+         (r `((?i (file . ,(concat starter-kit-dir "init.el")))
+              (?I (file . ,(concat starter-kit-dir "config.org")))
+              (?s (file . ,(let* ((system (system-name))
+                                  (org (expand-file-name (concat system ".org") starter-kit-dir))
+                                  (el  (expand-file-name (concat system ".el") starter-kit-dir))
+                                  (dir (expand-file-name system starter-kit-dir)))
+                             (cond
+                              ((file-exists-p org) org)
+                              ((file-exists-p el)  el)
+                              (t dir)))))
+              ))
+       (set-register (car r) (cadr r)))
+  #+end_src
 
 ** Minibuffer
-*** Ido-mode
-**** Base Ido: show recent files
-     Go to recently-opened files first.
-#+begin_src emacs-lisp :tangle no
-  (setq ido-enable-flex-matching t)
-  (setq ido-everywhere t)
-  (ido-mode 1)
-  (setq ido-use-filename-at-point 'guess
-        ido-create-new-buffer 'always
-        ido-use-virtual-buffers t
-        ido-use-url-at-point t)
-  
-  (setq ido-file-extensions-order '(".org" ".fb2" ".tex" ".txt" ".py" ".xml" ".el" ".ini" ".cfg" ".cnf"))
-  
-  ;; Ignore the .aux extensions that TeX programs create 
-  (setq completion-ignored-extensions 
-        (cons "*.aux" completion-ignored-extensions)) 
-  
-  ;; Ignore files defined in variable completion-ignored-extensions 
-  (setq ido-ignore-extensions t) 
-  (setq ido-default-buffer-method 'selected-window)
-  
-  (add-hook 'ido-make-file-list-hook 'ido-sort-mtime)
-  (add-hook 'ido-make-dir-list-hook 'ido-sort-mtime)
-  
-  (defun ido-sort-mtime ()
-    (setq ido-temp-list
-          (sort ido-temp-list 
-                (lambda (a b)
-                  (let ((ta (nth 5 (file-attributes (concat ido-current-directory a))))
-                        (tb (nth 5 (file-attributes (concat ido-current-directory b)))))
-                    (if (= (nth 0 ta) (nth 0 tb))
-                        (> (nth 1 ta) (nth 1 tb))
-                      (> (nth 0 ta) (nth 0 tb)))))))
-    (ido-to-end  ;; move . files to end (again)
-     (delq nil (mapcar
-                (lambda (x) (if (string-equal (substring x 0 1) ".") x))
-                ido-temp-list))))
-  
-  ;; Stops Ido searching for similar-named files if I use C-x C-s to create a new 
-  ;; file and buffer 
-  (setq ido-auto-merge-work-directories-length -1) 
-  
-  ;; Keep annoying buffers out of my face 
-  (setq ido-ignore-buffers (list (rx (or (and bos  " ") 
-                                         (and bos 
-                                              (or "*Completions*" 
-                                                  "*Shell Command Output*" 
-                                                  "*vc-diff*") 
-                                              eos))))) 
-  
-  ;; Allow spaces when using ido-find-file 
-  (add-hook 'ido-make-file-list-hook 
-            (lambda () 
-              (define-key ido-file-dir-completion-map (kbd "SPC") 'self-insert-command))) 
-  
-  ;; Use ~ to open files in home directory
-  (add-hook 'ido-setup-hook
-            (lambda ()
-              ;; Go straight home
-              (define-key ido-file-completion-map
-                (kbd "~")
-                (lambda ()
-                  (interactive)
-                  (if (looking-back "/")
-                      (insert "~/")
-                    (call-interactively 'self-insert-command))))))
-  
-  ;; Disable TRAMP
-  (custom-set-variables
-   '(ido-enable-tramp-completion nil))
-
-  (add-to-list 'ido-work-directory-list-ignore-regexps tramp-file-name-regexp)
-#+end_src
-
-**** Ido anywhere
-#+begin_src emacs-lisp :tangle no
-  (av/require+ 'ido-ubiquitous)
-  (ido-ubiquitous-mode 1)
-  
-  ;; Fix ido-ubiquitous for newer packages
-  (defmacro ido-ubiquitous-use-new-completing-read (cmd package)
-    `(eval-after-load ,package
-       '(defadvice ,cmd (around ido-ubiquitous-new activate)
-          (let ((ido-ubiquitous-enable-compatibility nil))
-            ad-do-it))))
-  
-  (ido-ubiquitous-use-new-completing-read webjump 'webjump)
-  (ido-ubiquitous-use-new-completing-read yas/expand 'yasnippet)
-  (ido-ubiquitous-use-new-completing-read yas/visit-snippet-file 'yasnippet)
-#+end_src
 *** Minibuffer editing
     Sometimes you want to be able to do fancy things with the text
     that you're entering into the minibuffer. This binds =C-M-e= in a
@@ -202,30 +110,23 @@ for this file) to jump to it.
 (if (require 'miniedit nil t)
     (miniedit-install))
 #+end_src
-*** Completion for M-x 
-#+begin_src emacs-lisp :tangle no
-  (av/require+ 'smex)
-  (smex-initialize)
-  
-  (global-set-key (kbd "M-x") 'smex)
-  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-  ;; This is your old M-x.
-  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command)
-#+end_src
 *** Helm
     #+begin_src emacs-lisp
       (av/require+ 'helm)
-      
+
       (require 'helm-config)
       ;; Replacement for Ido, smex, etc. But it looks like they need to be
       ;; disabled first.
       (helm-mode 1)      
-      
+      (helm-adaptative-mode 1)
+      ;;(setq helm-command-prefix-key something other than C-x c)
+
       ;; DWIM
       (global-set-key (kbd "<f5>") 'helm-mini)
       (global-set-key (kbd "C-x C-f") 'helm-find-files)
       (global-set-key (kbd "M-x") 'helm-M-x)
-            
+
+                  
     #+end_src
 ** Editing shortcuts
 *** Navigation 
@@ -532,6 +433,16 @@ for this file) to jump to it.
          (user-error (message "Imenu error caught and disposed of"))))
    #+end_src
 
+   Disable old theme first, then load.
+   #+begin_src emacs-lisp
+     (defun disable-all-themes ()
+       "disable all active themes."
+       (dolist (i custom-enabled-themes)
+         (disable-theme i)))
+
+     (defadvice load-theme (before disable-themes-first activate)
+       (disable-all-themes))
+   #+end_src
 #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
   ;;; Do not load in console mode - rely on terminal settings
   
@@ -641,8 +552,8 @@ for this file) to jump to it.
   (define-key ctl-x-map   "d" 'diredp-dired-files)
   (define-key ctl-x-4-map "d" 'diredp-dired-files-other-window)
 
-  (av/require+ 'dired-details)
-  (av/require+ 'dired-details+)
+  ;(av/require+ 'dired-details)
+  ;(av/require+ 'dired-details+)
 #+end_src
      
 **** Sorting options
@@ -776,11 +687,15 @@ for this file) to jump to it.
       (set-face-attribute 'mode-line nil :height 90)
       (set-face-attribute 'mode-line-inactive nil :height 90)
 
+      (set-face-attribute 'mode-line nil :underline nil)
+      (set-face-attribute 'mode-line-inactive nil :underline nil)
+
       (av/require+ 'powerline)
       (set-face-background 'powerline-active1 "#002b36")
       (set-face-background 'powerline-active2 "#073642")
       (powerline-default-theme)
     #+end_src
+
 *** e2wm Emacs window manager
 #+begin_src emacs-lisp
   (av/require+ 'e2wm)
@@ -1256,27 +1171,40 @@ for this file) to jump to it.
 
 *** Keys
 #+begin_src emacs-lisp
-    (global-set-key "\C-cl" 'org-store-link)
-    (global-set-key "\C-ca" 'org-agenda)
-    (global-set-key "\C-cb" 'org-iswitchb)
-    (define-key global-map "\C-cc" 'org-capture) ;Is it different than the lines above?
-    
-    ;; Return to activate a link
-    (setq org-return-follows-link t)
-    
-    (setq org-support-shift-select t)
-    
-    ;; Make windmove work in org-mode:
-    (add-hook 'org-shiftup-final-hook 'windmove-up)
-    (add-hook 'org-shiftleft-final-hook 'windmove-left)
-    (add-hook 'org-shiftdown-final-hook 'windmove-down)
-    (add-hook 'org-shiftright-final-hook 'windmove-right)
-    
-    (setq org-use-speed-commands t)
-  
-    ;; Pressing once brings the cursor to the beginning/end of the header
-    ;; Press again for the standard behavior
-    (setq org-special-ctrl-a/e t)
+  (global-set-key "\C-cl" 'org-store-link)
+  (global-set-key "\C-ca" 'org-agenda)
+  (global-set-key "\C-cb" 'org-iswitchb)
+  (define-key global-map "\C-cc" 'org-capture) ;Is it different than the lines above?
+
+  ;; Return to activate a link
+  (setq org-return-follows-link t)
+
+  (setq org-support-shift-select t)
+
+  ;; Make windmove work in org-mode:
+  (add-hook 'org-shiftup-final-hook 'windmove-up)
+  (add-hook 'org-shiftleft-final-hook 'windmove-left)
+  (add-hook 'org-shiftdown-final-hook 'windmove-down)
+  (add-hook 'org-shiftright-final-hook 'windmove-right)
+
+  (setq org-use-speed-commands t)
+
+  ;; Pressing once brings the cursor to the beginning/end of the header
+  ;; Press again for the standard behavior
+  (setq org-special-ctrl-a/e t)
+
+  (add-hook 'org-mode-hook
+            (lambda ()
+              (local-set-key "\M-\C-n" 'outline-next-visible-heading)
+              (local-set-key "\M-\C-p" 'outline-previous-visible-heading)
+              (local-set-key "\M-\C-u" 'outline-up-heading)
+              ;; table
+              (local-set-key "\M-\C-w" 'org-table-copy-region)
+              (local-set-key "\M-\C-y" 'org-table-paste-rectangle)
+              (local-set-key "\M-\C-l" 'org-table-sort-lines)
+              ;; display images
+              (local-set-key "\M-I" 'org-toggle-iimage-in-org)))
+
 #+end_src
 **** Shortcuts for LaTeX
      See [[info:org#CDLaTeX%20mode][info:org#CDLaTeX mode]]
@@ -2073,6 +2001,12 @@ for this file) to jump to it.
          (t
           (while (pcomplete-here (pcomplete-entries))))))
     #+end_src
+** Ansi Term
+   #+begin_src emacs-lisp
+     ;; Conflicts with tab-completion
+     (add-hook 'term-mode-hook (lambda()
+                                 (yas-minor-mode -1)))
+   #+end_src
 ** Emacs Lisp
 #+begin_src emacs-lisp
     ;;; Display ^L as horizontal lines
@@ -2103,4 +2037,6 @@ for this file) to jump to it.
 * org-configuration
 #+STARTUP:    align fold nodlcheck hidestars oddeven lognotestate
 #+OPTIONS: ^:nil
+#+property: header-args:emacs-lisp :results silent
+
 
