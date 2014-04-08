@@ -407,7 +407,9 @@ install packages.
   (define-key Apropos-Prefix (kbd "C-v") 'apropos-value)
 #+end_src
 **** Discover mode
+     Magit-like menu for frequently used shortcuts. Conflicts with undo-tree.
      #+begin_src emacs-lisp
+       (av/require+ 'makey)
        (av/require+ 'discover)
        (global-discover-mode 1)
      #+end_src
@@ -465,11 +467,14 @@ install packages.
 #+end_src
 
 ** Better undo
-#+begin_src emacs-lisp
-(av/require+ 'undo-tree)
+   #+begin_src emacs-lisp
+     (av/require+ 'undo-tree)
 
-(global-undo-tree-mode)
-#+end_src
+     (global-undo-tree-mode)
+
+     ;; Binds C-x r so things like discover-mode don't work
+     (define-key undo-tree-map (kbd "C-x r") nil)
+   #+end_src
 
 ** Buffers
 #+begin_src emacs-lisp
