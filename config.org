@@ -1695,38 +1695,28 @@ install packages.
 
 ** ESS
 *** General
-#+begin_src emacs-lisp
-    
-  (av/require+ 'ess) ; change to use-package
-    
-  ;; has to be set before loading ess-site
-  (when running-ntemacs
-    (setq ess-directory-containing-R "c:"))
-  
-  (require 'ess-site)
-  
-  (setq-default ansi-color-for-comint-mode 'filter
-                comint-prompt-read-only t
-                comint-scroll-to-bottom-on-input t
-                comint-scroll-to-bottom-on-output t
-                comint-move-point-for-output t)
-  
-  (setq ess-ask-for-ess-directory nil)
-  (setq ess-use-auto-complete t)
-  
-        ;;; enabled globally in ../keys.el
-  ;(defun ess-comma-space ()
-  ;  (local-set-key (kbd ",") (lambda () (interactive) (insert ", "))))
-  
-  ;(add-hook 'ess-mode-hook 'ess-comma-space)
-  
-  ;; conflicts with ess-R-smart-operators
-  ;;(add-hook 'inferior-ess-mode-hook 'ess-comma-space)
-  
-  ;; debugger
-  (setq ess-tracebug-prefix "\M-c")
-  (setq ess-use-tracebug t)
-#+end_src
+    #+begin_src emacs-lisp
+
+      (av/require+ 'ess) ; change to use-package
+
+      (require 'ess-site)
+
+      (setq-default ansi-color-for-comint-mode 'filter
+                    comint-prompt-read-only t
+                    comint-scroll-to-bottom-on-input t
+                    comint-scroll-to-bottom-on-output t
+                    comint-move-point-for-output t)
+
+      (setq ess-ask-for-ess-directory nil)
+      (setq ess-use-auto-complete t)
+
+      ;; Use Helm instead
+      (setq ess-use-ido nil)  
+
+      ;; debugger
+      (setq ess-tracebug-prefix "\M-c")
+      (setq ess-use-tracebug t)
+    #+end_src
 
 *** R
 #+begin_src emacs-lisp
