@@ -112,21 +112,21 @@ install packages.
 #+end_src
 *** Helm
     #+begin_src emacs-lisp
-      (av/require+ 'helm)
+      (use-package helm
+        :ensure t
+        :bind
+        (("<f5>"    . helm-mini)
+         ("C-x C-f" . helm-find-files)
+         ("M-x"     . helm-M-x))
 
-      (require 'helm-config)
-      ;; Replacement for Ido, smex, etc. But it looks like they need to be
-      ;; disabled first.
-      (helm-mode 1)      
-      (helm-adaptative-mode 1)
-      ;;(setq helm-command-prefix-key something other than C-x c)
-
-      ;; DWIM
-      (global-set-key (kbd "<f5>") 'helm-mini)
-      (global-set-key (kbd "C-x C-f") 'helm-find-files)
-      (global-set-key (kbd "M-x") 'helm-M-x)
-
-                  
+        :init
+        (progn
+          (use-package helm-config)
+          (use-package helm-ls-git :ensure t)
+          (helm-mode 1)      
+          (helm-adaptative-mode 1)))
+          
+          ;;(setq helm-command-prefix-key something other than C-x c))
     #+end_src
 ** Editing shortcuts
 *** Navigation 
@@ -483,6 +483,12 @@ install packages.
 #+end_src
 ** File management
 *** Dired
+**** Dired interface to 'find'
+     #+begin_src emacs-lisp
+       (use-package find-dired
+         :config
+         (setq find-ls-option '("-exec ls -ld {} \\+" . "-ld")))
+     #+end_src
 **** Mode to rename files by editing their names in dired buffers.
 #+begin_src emacs-lisp
   (av/require+ 'wdired)
@@ -553,12 +559,9 @@ install packages.
 **** Enhancements
 #+begin_src emacs-lisp
   (av/require+ 'dired+)
-;;  (av/require+ 'icicles) ;; required by dired+
+
   (define-key ctl-x-map   "d" 'diredp-dired-files)
   (define-key ctl-x-4-map "d" 'diredp-dired-files-other-window)
-
-  ;(av/require+ 'dired-details)
-  ;(av/require+ 'dired-details+)
 #+end_src
      
 **** Sorting options
@@ -584,7 +587,7 @@ install packages.
        (av/require+ 'dired-subtree)
           
        (define-key dired-mode-map
-         (kbd "M-I") 'dired-subtree-insert)
+         (kbd "<C-return>") 'dired-subtree-insert)
      #+end_src
 *** Tramp and editing files over SSH
     #+begin_src emacs-lisp
@@ -689,16 +692,19 @@ install packages.
 #+end_src
 *** Modeline
     #+begin_src emacs-lisp :tangle (if (window-system) "yes" "no")
-      (set-face-attribute 'mode-line nil :height 90)
-      (set-face-attribute 'mode-line-inactive nil :height 90)
+      (set-face-attribute 'mode-line nil :height 100)
+      (set-face-attribute 'mode-line-inactive nil :height 100)
 
       (set-face-attribute 'mode-line nil :underline nil)
       (set-face-attribute 'mode-line-inactive nil :underline nil)
 
-      (av/require+ 'powerline)
-      (set-face-background 'powerline-active1 "#002b36")
-      (set-face-background 'powerline-active2 "#073642")
-      (powerline-default-theme)
+      (use-package powerline
+        :ensure t
+        :init
+        (progn
+          (set-face-background 'powerline-active1 "#002b36")
+          (set-face-background 'powerline-active2 "#073642")
+          (powerline-default-theme)))
     #+end_src
 
 *** e2wm Emacs window manager
@@ -921,8 +927,9 @@ install packages.
     #+end_src
 ** Emacs server
 #+begin_src emacs-lisp
-  (server-start)
-  
+  (unless (daemonp)
+    (server-start))
+
   (add-hook 'server-switch-hook
             (lambda nil
               (let ((server-buf (current-buffer)))
@@ -932,9 +939,13 @@ install packages.
   (add-hook 'server-done-hook 'delete-frame)
     
   ;; Support for Google Chrome extension to edit text areas
-  (if (require 'edit-server nil t)
-      (edit-server-start))
-    
+  (use-package edit-server
+    :if window-system
+    :init
+    (progn
+      (add-hook 'after-init-hook 'server-start t)
+      (add-hook 'after-init-hook 'edit-server-start t)))
+
   ;; Keep emacs server running in background
   ;(defun my-done ()
   ;  (interactive)                                                                                     
@@ -1800,7 +1811,8 @@ install packages.
 ** SQL
 #+begin_src emacs-lisp
   (use-package sql
-    :init
+    :defer t
+    :config
     (progn
       (setq sql-postgres-program "nzsql")
   
